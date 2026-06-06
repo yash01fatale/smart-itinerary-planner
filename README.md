@@ -1,17 +1,40 @@
-# smart_itinerary_planner
+# 🧭 Smart Itinerary Planner and Tour Guide
 
-A new Flutter project.
+An AI-powered mobile application that generates structured travel itineraries based on user preferences.
 
-## Getting Started
+## 📋 Features
+- ✅ Smart itinerary generation (day-wise)
+- ✅ Nearby tourist spots recommendation
+- ✅ Approximate distance calculation
+- ✅ Weather conditions & precautions
+- ✅ Google Maps integration
+- ✅ Budget-based planning
+- ✅ Category-wise destinations (Hill Station, Beach, Mountains, Historical)
 
-This project is a starting point for a Flutter application.
+## 🛠️ Tech Stack
+- **Frontend:** Flutter (Dart)
+- **Backend:** Firebase (Auth, Firestore)
+- **AI/ML:** Google Gemini API / OpenAI GPT
+- **Maps:** Google Maps Platform
+- **Weather:** OpenWeather API
+- **Hosting:** Vercel (Web), Railway (Backend)
 
-A few resources to get you started if this is your first Flutter project:
+## 📱 Screenshots
+*(Add screenshots here)*
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## 🚀 Getting Started
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Prerequisites
+- Flutter SDK (3.0+)
+- Android Studio / VS Code
+- Firebase account
+- Google Maps API key
+- OpenWeather API key
+- Gemini/OpenAI API key
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/smart-itinerary-planner.git
+cd smart-itinerary-planner
