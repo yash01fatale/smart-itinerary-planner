@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 # 🧭 Smart Itinerary Planner and Tour Guide
-
 An AI-powered mobile application that generates structured travel itineraries based on user preferences.
 
 ## 📋 Features
@@ -39,7 +37,3 @@ An AI-powered mobile application that generates structured travel itineraries ba
 ```bash
 git clone https://github.com/yourusername/smart-itinerary-planner.git
 cd smart-itinerary-planner
-=======
-# smart-itinerary-planner
-AI-powered Smart Itinerary Planner and Tour Guide - Flutter Mobile App
->>>>>>> 6f19cd9e72f1e8bcd6d5bfed14d8f44f745b6e56
