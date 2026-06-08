@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:smart_itinerary_planner/widgets/app_bar.dart';
 import './GroupScreen.dart';
+import '../../widgets/app_bottom_nav_bar.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -19,8 +21,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
       "time": "2 min ago",
       "unread": 3,
       "online": true,
-      "image":
-          "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf"
+      "image": "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf"
     },
     {
       "name": "Maldives 2026",
@@ -28,8 +29,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
       "time": "1 hour ago",
       "unread": 0,
       "online": false,
-      "image":
-          "https://images.unsplash.com/photo-1573843981267-be1999ff37cd"
+      "image": "https://images.unsplash.com/photo-1573843981267-be1999ff37cd"
     },
     {
       "name": "Family Alpine Trip",
@@ -37,18 +37,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
       "time": "Yesterday",
       "unread": 1,
       "online": false,
-      "image":
-          "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+      "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
     },
     {
       "name": "London Business Weekend",
-      "message":
-          "Sarah: The itinerary for the Friday conference is ready.",
+      "message": "Sarah: The itinerary for the Friday conference is ready.",
       "time": "2 days ago",
       "unread": 0,
       "online": false,
-      "image":
-          "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad"
+      "image": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad"
     },
   ];
 
@@ -56,37 +53,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF8FAFC),
+      //Custom App Bar 
+      appBar: const CustomAppBar(showBackButton : false), 
 
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: const Row(
-          children: [
-            Icon(
-              Icons.explore,
-              color: Color(0xff006591),
-            ),
-            SizedBox(width: 8),
-            Text(
-              "TravelWise AI",
-              style: TextStyle(
-                color: Color(0xff006591),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            child: const CircleAvatar(
-              backgroundImage: NetworkImage(
-                "https://i.pravatar.cc/300",
-              ),
-            ),
-          ),
-        ],
-      ),
 
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xffFBBF24),
@@ -96,33 +65,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
           color: Colors.black,
         ),
       ),
-
-      // bottomNavigationBar: NavigationBar(
-      //   selectedIndex: selectedIndex,
-      //   onDestinationSelected: (value) {
-      //     setState(() {
-      //       selectedIndex = value;
-      //     });
-      //   },
-        // destinations: const [
-        //   NavigationDestination(
-        //     icon: Icon(Icons.explore_outlined),
-        //     label: "Explore",
-        //   ),
-        //   NavigationDestination(
-        //     icon: Icon(Icons.map_outlined),
-        //     label: "Trips",
-        //   ),
-        //   NavigationDestination(
-        //     icon: Icon(Icons.chat_bubble),
-        //     label: "Messages",
-        //   ),
-        //   NavigationDestination(
-        //     icon: Icon(Icons.person_outline),
-        //     label: "Profile",
-        //   ),
-        // ],
-      // ),
+      //Bootam NAvigation bar 
+      bottomNavigationBar: const AppBottomNavBar(selectedIndex: 1),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -130,12 +74,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
           children: [
             /// HEADER
             Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
                     Text(
                       "Your Itineraries",
@@ -166,8 +108,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(18),
                   borderSide: BorderSide.none,
                 ),
               ),
@@ -178,39 +119,32 @@ class _MessagesScreenState extends State<MessagesScreen> {
             /// CHAT LIST
             ListView.builder(
               shrinkWrap: true,
-              physics:
-                  const NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: chats.length,
               itemBuilder: (context, index) {
                 final chat = chats[index];
 
                 return Container(
-                  margin:
-                      const EdgeInsets.only(bottom: 16),
+                  margin: const EdgeInsets.only(bottom: 16),
                   child: Material(
                     color: Colors.white,
-                    borderRadius:
-                        BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(20),
                     elevation: 2,
                     child: InkWell(
-                      borderRadius:
-                          BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(20),
                       onTap: () {},
                       child: Padding(
-                        padding:
-                            const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(16),
                         child: Row(
                           children: [
                             Stack(
                               children: [
                                 CircleAvatar(
                                   radius: 32,
-                                  backgroundImage:
-                                      NetworkImage(
+                                  backgroundImage: NetworkImage(
                                     chat["image"],
                                   ),
                                 ),
-
                                 if (chat["online"])
                                   Positioned(
                                     bottom: 0,
@@ -218,117 +152,78 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                     child: Container(
                                       width: 16,
                                       height: 16,
-                                      decoration:
-                                          BoxDecoration(
-                                        color:
-                                            Colors.green,
-                                        border:
-                                            Border.all(
-                                          color:
-                                              Colors.white,
+                                      decoration: BoxDecoration(
+                                        color: Colors.green,
+                                        border: Border.all(
+                                          color: Colors.white,
                                           width: 2,
                                         ),
-                                        shape:
-                                            BoxShape.circle,
+                                        shape: BoxShape.circle,
                                       ),
                                     ),
                                   )
                               ],
                             ),
-
                             const SizedBox(width: 16),
-
                             Expanded(
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment
-                                        .start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment
-                                            .spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                         child: Text(
                                           chat["name"],
-                                          style:
-                                              const TextStyle(
-                                            fontWeight:
-                                                FontWeight
-                                                    .bold,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
                                             fontSize: 18,
                                           ),
                                         ),
                                       ),
                                       Text(
                                         chat["time"],
-                                        style:
-                                            const TextStyle(
-                                          color:
-                                              Colors.grey,
+                                        style: const TextStyle(
+                                          color: Colors.grey,
                                           fontSize: 12,
                                         ),
                                       ),
                                     ],
                                   ),
-
-                                  const SizedBox(
-                                      height: 6),
-
+                                  const SizedBox(height: 6),
                                   Row(
                                     children: [
                                       Expanded(
                                         child: Text(
                                           chat["message"],
                                           maxLines: 1,
-                                          overflow:
-                                              TextOverflow
-                                                  .ellipsis,
-                                          style:
-                                              const TextStyle(
-                                            color:
-                                                Colors.grey,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            color: Colors.grey,
                                           ),
                                         ),
                                       ),
-
-                                      if (chat[
-                                              "unread"] >
-                                          0)
+                                      if (chat["unread"] > 0)
                                         Container(
-                                          margin:
-                                              const EdgeInsets
-                                                  .only(
+                                          margin: const EdgeInsets.only(
                                             left: 10,
                                           ),
-                                          padding:
-                                              const EdgeInsets
-                                                  .all(
+                                          padding: const EdgeInsets.all(
                                             8,
                                           ),
-                                          decoration:
-                                              const BoxDecoration(
-                                            color:
-                                                Color(
+                                          decoration: const BoxDecoration(
+                                            color: Color(
                                               0xff006591,
                                             ),
-                                            shape: BoxShape
-                                                .circle,
+                                            shape: BoxShape.circle,
                                           ),
                                           child: Text(
-                                            chat["unread"]
-                                                .toString(),
-                                            style:
-                                                const TextStyle(
-                                              color:
-                                                  Colors
-                                                      .white,
-                                              fontSize:
-                                                  12,
-                                              fontWeight:
-                                                  FontWeight
-                                                      .bold,
+                                            chat["unread"].toString(),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                         )
@@ -353,8 +248,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               padding: const EdgeInsets.all(25),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius:
-                    BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(25),
                 border: Border.all(
                   color: Colors.grey.shade300,
                 ),
@@ -363,18 +257,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 children: [
                   CircleAvatar(
                     radius: 35,
-                    backgroundColor:
-                        const Color(0xff006591)
-                            .withOpacity(.1),
+                    backgroundColor: const Color(0xff006591).withOpacity(.1),
                     child: const Icon(
                       Icons.group_add,
                       size: 35,
                       color: Color(0xff006591),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
                   const Text(
                     "Planning a new adventure?",
                     textAlign: TextAlign.center,
@@ -383,9 +273,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       fontSize: 22,
                     ),
                   ),
-
                   const SizedBox(height: 10),
-
                   const Text(
                     "Create a group chat to coordinate itineraries, share flight details and plan your journey together.",
                     textAlign: TextAlign.center,
@@ -393,22 +281,20 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       color: Colors.grey,
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
                   ElevatedButton.icon(
-                    style:
-                        ElevatedButton.styleFrom(
-                      backgroundColor:
-                          const Color(0xff006591),
-                      padding:
-                          const EdgeInsets.symmetric(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff006591),
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 25,
                         vertical: 15,
                       ),
                     ),
                     onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder:(context)=> const CreateGroupScreen()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const CreateGroupScreen()));
                     },
                     icon: const Icon(Icons.add),
                     label: const Text(

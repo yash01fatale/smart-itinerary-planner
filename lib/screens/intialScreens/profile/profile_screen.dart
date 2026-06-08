@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../widgets/app_bottom_nav_bar.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -7,7 +8,6 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FF),
-
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -39,23 +39,21 @@ class ProfileScreen extends StatelessWidget {
           )
         ],
       ),
-
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFFFBBF24),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pop(context);
+        },
         child: const Icon(
           Icons.add,
           color: Colors.black,
         ),
       ),
-
-     
-
+      bottomNavigationBar: const AppBottomNavBar(selectedIndex: 4),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-
             /// Profile Header
             Container(
               width: double.infinity,
@@ -104,9 +102,7 @@ class ProfileScreen extends StatelessWidget {
                       )
                     ],
                   ),
-
                   const SizedBox(height: 20),
-
                   const Text(
                     "Alex Explorer",
                     style: TextStyle(
@@ -114,9 +110,7 @@ class ProfileScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   const SizedBox(height: 10),
-
                   const Text(
                     "Adventure seeker and mountain lover. Always looking for the next hidden gem. Passionate about sustainable travel and capturing landscapes through my lens.",
                     textAlign: TextAlign.center,
@@ -124,9 +118,7 @@ class ProfileScreen extends StatelessWidget {
                       color: Colors.grey,
                     ),
                   ),
-
                   const SizedBox(height: 25),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -208,7 +200,6 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(20),
@@ -220,12 +211,10 @@ class ProfileScreen extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   ),
-
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
                           "Maldives Tropical Escape",
@@ -234,38 +223,28 @@ class ProfileScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-
                         const SizedBox(height: 8),
-
                         const Row(
                           children: [
-                            Icon(Icons.calendar_today,
-                                size: 16),
+                            Icon(Icons.calendar_today, size: 16),
                             SizedBox(width: 5),
                             Text("Oct 12 - Oct 19"),
                           ],
                         ),
-
                         const SizedBox(height: 5),
-
                         const Row(
                           children: [
-                            Icon(Icons.location_on,
-                                size: 16),
+                            Icon(Icons.location_on, size: 16),
                             SizedBox(width: 5),
                             Text("Male, Maldives"),
                           ],
                         ),
-
                         const SizedBox(height: 15),
-
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            style:
-                                ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color(0xFF0EA5E9),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF0EA5E9),
                             ),
                             onPressed: () {},
                             child: const Text(
@@ -360,9 +339,9 @@ class ProfileScreen extends StatelessWidget {
   }
 
   static Widget _settingTile(
-      IconData icon,
-      String title,
-      ) {
+    IconData icon,
+    String title,
+  ) {
     return ListTile(
       leading: Icon(icon),
       title: Text(title),

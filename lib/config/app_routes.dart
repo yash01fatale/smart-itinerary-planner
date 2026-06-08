@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_itinerary_planner/screens/exploreScreen.dart';
 
 import '../screens/intialScreens/splash_screen.dart';
 import '../screens/onboarding_screen.dart';
@@ -28,6 +29,7 @@ class AppRoutes {
   static const profileScreen = "/profile";
   static const chatbot = "/chatbot";
   static const messagesScreen = "/chatscreen";
+  static const exploreScreen = "/explore";
 
   static Map<String, WidgetBuilder> get routes => {
         splash: (_) => const SplashScreen(),
@@ -41,5 +43,6 @@ class AppRoutes {
         savedTrips: (_) => const SavedTripsScreen(),
         messagesScreen: (_) => const MessagesScreen(),
         profileScreen: (_) => const ProfileScreen(),
+        exploreScreen:(_)=> const ExploreScreen(),
       };
 }

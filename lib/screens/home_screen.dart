@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smart_itinerary_planner/widgets/app_bar.dart';
+import 'package:smart_itinerary_planner/widgets/app_bottom_nav_bar.dart';
 import '../config/app_routes.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -47,33 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF8FAFC),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: const Row(
-          children: [
-            Icon(Icons.explore, color: Color(0xff006591)),
-            SizedBox(width: 8),
-            Text(
-              "TravelWise AI",
-              style: TextStyle(
-                color: Color(0xff006591),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 15),
-            child: CircleAvatar(
-              backgroundImage: NetworkImage(
-                "https://i.pravatar.cc/300",
-              ),
-            ),
-          )
-        ],
-      ),
+      // custom app bar 
+      appBar:const CustomAppBar(showBackButton: false,),
+      
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color(0xff006591),
         elevation: 8,
@@ -90,48 +68,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            selectedIndex = index;
-          });
+     
+      bottomNavigationBar: const AppBottomNavBar(selectedIndex: 0),
 
-          if (index == 0) {
-            Navigator.pushNamed(context, AppRoutes.messagesScreen);
-          } else if (index == 1) {
-            Navigator.pushNamed(context, AppRoutes.chatbot);
-          } else if (index == 2) {
-            Navigator.pushNamed(context, AppRoutes.itinerary);
-          } else if (index == 3) {
-            Navigator.pushNamed(context, AppRoutes.savedTrips);
-          } else if (index == 4) {
-            Navigator.pushNamed(context, AppRoutes.profileScreen);
-          }
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.chat_bubble_sharp),
-            label: "ChatScreen",
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.search),
-            label: "Explore",
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.map),
-            label: "Trips",
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.bookmark),
-            label: "Saved",
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person),
-            label: "Profile",
-          ),
-        ],
-      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
