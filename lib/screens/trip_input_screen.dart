@@ -244,7 +244,7 @@ class _TripInputScreenState extends State<TripInputScreen> {
                     "budget": budget.toInt(),
                   });
 
-                  Navigator.pushNamed(context, AppRoutes.itinerary);
+                  // Navigator.pushNamed();
                 },
               ),
             ),

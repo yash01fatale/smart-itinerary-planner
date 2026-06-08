@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:smart_itinerary_planner/widgets/app_bar.dart';
 import 'package:smart_itinerary_planner/widgets/app_bottom_nav_bar.dart';
 import '../config/app_routes.dart';
+import '../services/weather_service.dart';
+import '../widgets/weather_card.dart';
+import '../models/weather_data.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,7 +14,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final WeatherService weatherService = WeatherService();
+  final TextEditingController searchController = TextEditingController();
+  WeatherModel? weather;
+  bool isLoading = true;
   int selectedIndex = 0;
+  String currentCity = 'Pune';
+  String? errorMessage;
 
   final List<Map<String, dynamic>> categories = [
     {"title": "Hill Station", "icon": Icons.landscape},
@@ -46,12 +55,58 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    loadWeather();
+  }
+
+  Future<void> loadWeather({String? city}) async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+    try {
+      final cityToLoad = city ?? currentCity;
+      final weatherData = await weatherService.getWeather(cityToLoad);
+      setState(() {
+        weather = weatherData;
+        currentCity = cityToLoad;
+        searchController.clear();
+      });
+    } catch (e) {
+      debugPrint('Failed to load weather: $e');
+      setState(() {
+        errorMessage = 'City not found. Please try again.';
+        weather = null;
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _searchCity() {
+    final searchText = searchController.text.trim();
+    if (searchText.isNotEmpty) {
+      loadWeather(city: searchText);
+    }
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF8FAFC),
-      // custom app bar 
-      appBar:const CustomAppBar(showBackButton: false,),
-      
+
+      // custom app bar
+      appBar: const CustomAppBar(showBackButton: false),
+
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color(0xff006591),
         elevation: 8,
@@ -68,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-     
+
       bottomNavigationBar: const AppBottomNavBar(selectedIndex: 0),
 
       body: SingleChildScrollView(
@@ -116,10 +171,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Expanded(
                           child: TextField(
+                            controller: searchController,
+                            onSubmitted: (_) => _searchCity(),
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Colors.white,
-                              hintText: "Search Destination",
+                              hintText: "Search City",
                               prefixIcon: const Icon(Icons.search),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(18),
@@ -137,9 +194,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               vertical: 18,
                             ),
                           ),
-                          onPressed: _goToTripInput,
+                          onPressed: _searchCity,
                           child: const Text(
-                            "Explore",
+                            "Search",
                             style: TextStyle(
                               color: Colors.black,
                             ),
@@ -151,6 +208,48 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Weather in $currentCity',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(height: 12),
+            if (errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    errorMessage!,
+                    style: TextStyle(
+                      color: Colors.red.shade700,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              )
+            else if (isLoading)
+              const Center(
+                child: CircularProgressIndicator(),
+              )
+            else if (weather != null)
+              WeatherCard(weather: weather!)
+            else
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Text("Weather not available"),
+              ),
+            SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(

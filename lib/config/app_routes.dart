@@ -8,7 +8,6 @@ import '../screens/intialScreens/signup_screen.dart' hide LoginScreen;
 import '../screens/intialScreens/forgot_password_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/trip_input_screen.dart';
-import '../screens/itinerary_screen.dart';
 import '../screens/saved_trips_screen.dart';
 import '../screens/messageScreens/Message_screen.dart';
 import '../screens/intialScreens/profile/profile_screen.dart';
@@ -22,7 +21,6 @@ class AppRoutes {
   static const home = '/home';
   static const destination = "/destination";
   static const tripInput = "/tripInput";
-  static const itinerary = "/itinerary";
   static const destinationDetail = "/destinationDetail";
   static const trips = "/trips";
   static const savedTrips = "/savedTrips";
@@ -37,9 +35,8 @@ class AppRoutes {
         login: (_) => LoginScreen(),
         signup: (_) => SignupScreen(),
         forgotPassword: (_) => const ForgotPasswordScreen(),
-        home: (_) => const HomeScreen(),
+        home: (_) =>  HomeScreen(),
         tripInput: (_) => const TripInputScreen(),
-        itinerary: (_) => const ItineraryScreen(),
         savedTrips: (_) => const SavedTripsScreen(),
         messagesScreen: (_) => const MessagesScreen(),
         profileScreen: (_) => const ProfileScreen(),
