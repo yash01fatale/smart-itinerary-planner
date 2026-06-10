@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_itinerary_planner/widgets/app_bar.dart';
-import '../config/app_routes.dart';
 import '../widgets/app_bottom_nav_bar.dart';
 
 class TripInputScreen extends StatefulWidget {
@@ -69,7 +68,9 @@ class _TripInputScreenState extends State<TripInputScreen> {
       backgroundColor: const Color(0xffF8FAFC),
 
       // custom app and the bottam bar
-      appBar: CustomAppBar(showBackButton: false,),
+      appBar: CustomAppBar(
+        showBackButton: false,
+      ),
       bottomNavigationBar: const AppBottomNavBar(selectedIndex: 2),
 
       body: SingleChildScrollView(

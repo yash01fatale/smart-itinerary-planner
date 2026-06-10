@@ -1,6 +1,9 @@
 import 'dart:ui';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../config/app_routes.dart';
+import '../../models/user_model.dart';
+import '../../services/firebase_service.dart';
 
 class SignupScreen extends StatelessWidget {
   const SignupScreen({super.key});
@@ -11,6 +14,82 @@ class SignupScreen extends StatelessWidget {
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
     final confirmController = TextEditingController();
+
+    Future<void> signup(BuildContext context) async {
+      if (nameController.text.isEmpty ||
+          emailController.text.isEmpty ||
+          passwordController.text.isEmpty ||
+          confirmController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Please fill all fields"),
+          ),
+        );
+        return;
+      }
+
+      if (passwordController.text != confirmController.text) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Passwords do not match"),
+          ),
+        );
+        return;
+      }
+
+      try {
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        );
+
+        if (userCredential.user != null) {
+          // Save user profile to Firestore
+          final userModel = UserModel(
+            uid: userCredential.user!.uid,
+            name: nameController.text.trim(),
+            email: emailController.text.trim(),
+            photoUrl: null,
+          );
+
+          await FirestoreService().saveUser(userModel);
+
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Account Created Successfully"),
+              ),
+            );
+
+            Navigator.pushReplacementNamed(
+              context,
+              AppRoutes.login,
+            );
+          }
+        }
+      } on FirebaseAuthException catch (e) {
+        String message;
+
+        switch (e.code) {
+          case 'email-already-in-use':
+            message = 'Email already exists';
+            break;
+          case 'weak-password':
+            message = 'Password should be at least 6 characters';
+            break;
+          case 'invalid-email':
+            message = 'Invalid email';
+            break;
+          default:
+            message = e.message ?? 'Signup failed';
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    }
 
     return Scaffold(
       body: Stack(
@@ -101,60 +180,45 @@ class SignupScreen extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-
                             const SizedBox(height: 30),
-
                             _buildTextField(
                               controller: nameController,
                               hint: "Full Name",
                               icon: Icons.person,
                             ),
-
                             const SizedBox(height: 20),
-
                             _buildTextField(
                               controller: emailController,
                               hint: "Email Address",
                               icon: Icons.email,
                             ),
-
                             const SizedBox(height: 20),
-
                             _buildTextField(
                               controller: passwordController,
                               hint: "Password",
                               icon: Icons.lock,
                               obscure: true,
                             ),
-
                             const SizedBox(height: 20),
-
                             _buildTextField(
                               controller: confirmController,
                               hint: "Confirm Password",
                               icon: Icons.lock_outline,
                               obscure: true,
                             ),
-
                             const SizedBox(height: 30),
-
                             SizedBox(
                               width: double.infinity,
                               height: 58,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color(0xffFBBF24),
+                                  backgroundColor: const Color(0xffFBBF24),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(18),
+                                    borderRadius: BorderRadius.circular(18),
                                   ),
                                 ),
-                                onPressed: () {
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    AppRoutes.home,
-                                  );
+                                onPressed: () async {
+                                  await signup(context);
                                 },
                                 child: const Text(
                                   "Create Account",
@@ -166,12 +230,9 @@ class SignupScreen extends StatelessWidget {
                                 ),
                               ),
                             ),
-
                             const SizedBox(height: 20),
-
                             Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 const Text(
                                   "Already have an account?",
@@ -190,8 +251,7 @@ class SignupScreen extends StatelessWidget {
                                     "Login",
                                     style: TextStyle(
                                       color: Color(0xffFBBF24),
-                                      fontWeight:
-                                          FontWeight.bold,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),

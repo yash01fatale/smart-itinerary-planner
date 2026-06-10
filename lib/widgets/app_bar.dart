@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class CustomAppBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -8,11 +11,13 @@ class CustomAppBar extends StatelessWidget
     super.key,
     this.showBackButton = false,
   });
+
   @override
   Widget build(BuildContext context) {
-    
+    final user = FirebaseAuth.instance.currentUser;
+    final photoUrl = user?.photoURL;
+
     return AppBar(
-      automaticallyImplyLeading: true,
       elevation: 0,
       backgroundColor: Colors.white,
       title: const Row(
@@ -32,12 +37,15 @@ class CustomAppBar extends StatelessWidget
         ],
       ),
       actions: [
-        Container(
-          margin: const EdgeInsets.only(right: 16),
-          child: const CircleAvatar(
-            backgroundImage: NetworkImage(
-              "https://i.pravatar.cc/300",
-            ),
+        Padding(
+          padding: const EdgeInsets.only(right: 16),
+          child: CircleAvatar(
+            backgroundImage: photoUrl != null && photoUrl.isNotEmpty
+                ? NetworkImage(photoUrl)
+                : null,
+            child: photoUrl == null || photoUrl.isEmpty
+                ? const Icon(Icons.person)
+                : null,
           ),
         ),
       ],

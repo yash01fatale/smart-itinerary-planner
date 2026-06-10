@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:smart_itinerary_planner/services/recommendation_service.dart';
 import 'package:smart_itinerary_planner/widgets/app_bar.dart';
 import 'package:smart_itinerary_planner/widgets/app_bottom_nav_bar.dart';
 import '../config/app_routes.dart';
 import '../services/weather_service.dart';
 import '../widgets/weather_card.dart';
 import '../models/weather_data.dart';
+import '../models/recommendation_model.dart';
+import '../widgets/recommendation_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
   String currentCity = 'Pune';
   String? errorMessage;
+  bool isLoadingRecommendations = false;
+  List<RecommendationModel> nearbyRecommendations = [];
 
   final List<Map<String, dynamic>> categories = [
     {"title": "Hill Station", "icon": Icons.landscape},
@@ -29,41 +34,57 @@ class _HomeScreenState extends State<HomeScreen> {
     {"title": "Historical", "icon": Icons.account_balance},
   ];
 
-  final List<Map<String, String>> recommendations = [
-    {
-      "title": "Kyoto Cultural Tour",
-      "days": "7 Days",
-      "country": "Japan",
-      "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e"
-    },
-    {
-      "title": "Cinque Terre Coastal",
-      "days": "4 Days",
-      "country": "Italy",
-      "image": "https://images.unsplash.com/photo-1516483638261-f4dbaf036963"
-    },
-    {
-      "title": "Swiss Alpine Retreat",
-      "days": "10 Days",
-      "country": "Switzerland",
-      "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
-    },
-  ];
-
   void _goToTripInput() {
     Navigator.pushNamed(context, AppRoutes.tripInput);
   }
+
+  // Recommandation
 
   @override
   void initState() {
     super.initState();
     loadWeather();
+    fetchRecommendations();
+  }
+
+  List<RecommendationModel> recommendation = [];
+
+  Future<void> fetchRecommendations() async {
+    try {
+      recommendation =
+          await RecommendationApiService.getTopRecommendations(topN: 10);
+    } catch (e) {
+      debugPrint('Failed to fetch recommendations: $e');
+      recommendation = [];
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _fetchTopRecommendations() async {
+    setState(() {
+      isLoadingRecommendations = true;
+    });
+
+    try {
+      nearbyRecommendations =
+          await RecommendationApiService.getTopRecommendations(topN: 10);
+    } catch (e) {
+      debugPrint('Failed to fetch recommendations: $e');
+      nearbyRecommendations = [];
+    } finally {
+      setState(() {
+        isLoadingRecommendations = false;
+      });
+    }
   }
 
   Future<void> loadWeather({String? city}) async {
     setState(() {
       isLoading = true;
       errorMessage = null;
+      nearbyRecommendations = [];
     });
     try {
       final cityToLoad = city ?? currentCity;
@@ -73,11 +94,17 @@ class _HomeScreenState extends State<HomeScreen> {
         currentCity = cityToLoad;
         searchController.clear();
       });
+
+      // Fetch top recommendations for the searched city
+      if (city != null && city.isNotEmpty) {
+        await _fetchTopRecommendations();
+      }
     } catch (e) {
       debugPrint('Failed to load weather: $e');
       setState(() {
         errorMessage = 'City not found. Please try again.';
         weather = null;
+        nearbyRecommendations = [];
       });
     } finally {
       setState(() {
@@ -333,46 +360,49 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+            // Show search recommendations if available
+            if (nearbyRecommendations.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Top Recommendations",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff006591),
+                    ),
+                  ),
+                ),
+              ),
+              if (isLoadingRecommendations)
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: CircularProgressIndicator(),
+                )
+              else
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: nearbyRecommendations.length,
+                  itemBuilder: (context, index) {
+                    return RecommendationCard(
+                      item: nearbyRecommendations[index],
+                      onTap: _goToTripInput,
+                    );
+                  },
+                ),
+              const SizedBox(height: 20),
+            ],
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: recommendations.length,
-              itemBuilder: (_, index) {
-                final item = recommendations[index];
-
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(20),
-                        ),
-                        child: Image.network(
-                          item["image"]!,
-                          height: 180,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      ListTile(
-                        title: Text(item["title"]!),
-                        subtitle: Text(
-                          "${item["days"]} • ${item["country"]}",
-                        ),
-                        trailing: const Icon(
-                          Icons.arrow_forward_ios,
-                        ),
-                        onTap: _goToTripInput,
-                      ),
-                    ],
-                  ),
+              itemCount: recommendation.length,
+              itemBuilder: (context, index) {
+                return RecommendationCard(
+                  item: recommendation[index],
+                  onTap: _goToTripInput,
                 );
               },
             ),

@@ -23,9 +23,7 @@ class WeatherCard extends StatelessWidget {
             "https://openweathermap.org/img/wn/${weather.icon}@2x.png",
             width: 60,
           ),
-
           const SizedBox(width: 15),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
