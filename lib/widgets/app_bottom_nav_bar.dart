@@ -59,43 +59,23 @@ class AppBottomNavBar extends StatelessWidget {
       },
       destinations: const [
         NavigationDestination(
-          icon: Icon(Icons.chat_bubble_sharp),
-          selectedIcon: Icon(
-            Icons.person,
-            color: Color(0xff006591),
-          ),
+          icon: Icon(Icons.chat_outlined),
           label: "Chat",
         ),
         NavigationDestination(
-          icon: Icon(Icons.search),
-          selectedIcon: Icon(
-            Icons.person,
-            color: Color(0xff006591),
-          ),
+          icon: Icon(Icons.expand_less_outlined),
           label: "Explore",
         ),
         NavigationDestination(
           icon: Icon(Icons.map),
-          selectedIcon: Icon(
-            Icons.person,
-            color: Color(0xff006591),
-          ),
           label: "Trips",
         ),
         NavigationDestination(
           icon: Icon(Icons.bookmark),
-          selectedIcon: Icon(
-            Icons.person,
-            color: Color(0xff006591),
-          ),
           label: "Saved",
         ),
         NavigationDestination(
           icon: Icon(Icons.person),
-          selectedIcon: Icon(
-            Icons.person,
-            color: Color(0xff006591),
-          ),
           label: "Profile",
         ),
       ],

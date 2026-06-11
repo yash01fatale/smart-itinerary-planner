@@ -23,15 +23,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     extendBodyBehindAppBar: true,
-  backgroundColor: const Color(0xffF4FAFF),
-
+      extendBodyBehindAppBar: true,
+      backgroundColor: const Color(0xffF4FAFF),
+      
       appBar: const CustomAppBar(
         showBackButton: false,
       ),
       bottomNavigationBar: const AppBottomNavBar(
         selectedIndex: 1,
       ),
+
       body: Column(
         children: [
           const SizedBox(height: 10),
@@ -46,38 +47,38 @@ class _MessagesScreenState extends State<MessagesScreen> {
           const SizedBox(height: 50),
 
           /// SEARCH BAR
-         Container(
-  margin: const EdgeInsets.symmetric(horizontal: 20),
-  decoration: BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(30),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(.05),
-        blurRadius: 12,
-      ),
-    ],
-  ),
-  child: TextField(
-    controller: _searchController,
-    onChanged: (value) {
-      setState(() {
-        searchText = value.toLowerCase();
-      });
-    },
-    decoration: const InputDecoration(
-      hintText: "Search travelers...",
-      prefixIcon: Icon(
-        Icons.travel_explore,
-        color: Color(0xff0083B0),
-      ),
-      border: InputBorder.none,
-      contentPadding: EdgeInsets.symmetric(
-        vertical: 18,
-      ),
-    ),
-  ),
-),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(.05),
+                  blurRadius: 12,
+                ),
+              ],
+            ),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  searchText = value.toLowerCase();
+                });
+              },
+              decoration: const InputDecoration(
+                hintText: "Search travelers...",
+                prefixIcon: Icon(
+                  Icons.travel_explore,
+                  color: Color(0xff0083B0),
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 18,
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: 15),
 
           /// USERS LIST

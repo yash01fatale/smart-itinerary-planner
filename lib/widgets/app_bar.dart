@@ -18,6 +18,7 @@ class CustomAppBar extends StatelessWidget
     final photoUrl = user?.photoURL;
 
     return AppBar(
+      automaticallyImplyLeading: false,
       elevation: 0,
       backgroundColor: Colors.white,
       title: const Row(

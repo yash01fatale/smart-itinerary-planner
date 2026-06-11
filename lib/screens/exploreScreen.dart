@@ -34,34 +34,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
           ],
         ),
       ),
-    //   bottomNavigationBar: BottomNavigationBar(
-    //     currentIndex: currentIndex,
-    //     selectedItemColor: Color(0xFF006A61),
-    //     unselectedItemColor: Colors.grey,
-    //     onTap: (i) {
-    //       setState(() {
-    //         currentIndex = i;
-    //       });
-    //     },
-    //     items: const [
-    //       BottomNavigationBarItem(
-    //         icon: Icon(Icons.home),
-    //         label: 'Home',
-    //       ),
-    //       BottomNavigationBarItem(
-    //         icon: Icon(Icons.explore),
-    //         label: 'Explore',
-    //       ),
-    //       BottomNavigationBarItem(
-    //         icon: Icon(Icons.bookmark),
-    //         label: 'Saved',
-    //       ),
-    //       BottomNavigationBarItem(
-    //         icon: Icon(Icons.person),
-    //         label: 'Profile',
-    //       ),
-    //     ],
-    //   ),
     );
   }
 }
