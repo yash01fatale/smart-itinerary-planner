@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-import 'providers/auth_provider.dart';
+
 import 'firebase_options.dart';
+
 import 'config/app_routes.dart';
 import 'config/app_theme.dart';
+
+import 'providers/auth_provider.dart';
+import 'providers/trip_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,18 +25,28 @@ class SmartItineraryPlanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Smart Itinerary Planner',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      initialRoute: AppRoutes.splash,
-      routes: AppRoutes.routes,
-      builder: (context, child) {
-        return ChangeNotifierProvider(
-          create: (context) => AuthProvider(),
-          child: child!,
-        );
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AuthProvider>(
+          create: (_) => AuthProvider(),
+        ),
+        ChangeNotifierProvider<TripProvider>(
+          create: (_) => TripProvider(),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Smart Itinerary Planner',
+        debugShowCheckedModeBanner: false,
+
+        // Theme
+        theme: AppTheme.lightTheme,
+
+        // First Screen
+        initialRoute: AppRoutes.splash,
+
+        // Routes
+        routes: AppRoutes.routes,
+      ),
     );
   }
 }
