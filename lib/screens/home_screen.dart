@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:smart_itinerary_planner/services/recommendation_service.dart';
+import 'package:smart_itinerary_planner/widgets/app_bar.dart';
+import 'package:smart_itinerary_planner/widgets/app_bottom_nav_bar.dart';
 import '../config/app_routes.dart';
+import '../services/weather_service.dart';
+import '../widgets/weather_card.dart';
+import '../models/weather_data.dart';
+import '../models/recommendation_model.dart';
+import '../widgets/recommendation_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,7 +17,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final WeatherService weatherService = WeatherService();
+  final TextEditingController searchController = TextEditingController();
+  WeatherModel? weather;
+  bool isLoading = true;
   int selectedIndex = 0;
+  String currentCity = 'Pune';
+  String? errorMessage;
+  bool isLoadingRecommendations = false;
+  List<RecommendationModel> nearbyRecommendations = [];
 
   final List<Map<String, dynamic>> categories = [
     {"title": "Hill Station", "icon": Icons.landscape},
@@ -18,62 +34,106 @@ class _HomeScreenState extends State<HomeScreen> {
     {"title": "Historical", "icon": Icons.account_balance},
   ];
 
-  final List<Map<String, String>> recommendations = [
-    {
-      "title": "Kyoto Cultural Tour",
-      "days": "7 Days",
-      "country": "Japan",
-      "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e"
-    },
-    {
-      "title": "Cinque Terre Coastal",
-      "days": "4 Days",
-      "country": "Italy",
-      "image": "https://images.unsplash.com/photo-1516483638261-f4dbaf036963"
-    },
-    {
-      "title": "Swiss Alpine Retreat",
-      "days": "10 Days",
-      "country": "Switzerland",
-      "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
-    },
-  ];
-
   void _goToTripInput() {
     Navigator.pushNamed(context, AppRoutes.tripInput);
+  }
+
+  // Recommandation
+
+  @override
+  void initState() {
+    super.initState();
+    loadWeather();
+    fetchRecommendations();
+  }
+
+  List<RecommendationModel> recommendation = [];
+
+  Future<void> fetchRecommendations() async {
+    try {
+      recommendation =
+          await RecommendationApiService.getTopRecommendations(topN: 10);
+    } catch (e) {
+      debugPrint('Failed to fetch recommendations: $e');
+      recommendation = [];
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _fetchTopRecommendations() async {
+    setState(() {
+      isLoadingRecommendations = true;
+    });
+
+    try {
+      nearbyRecommendations =
+          await RecommendationApiService.getTopRecommendations(topN: 10);
+    } catch (e) {
+      debugPrint('Failed to fetch recommendations: $e');
+      nearbyRecommendations = [];
+    } finally {
+      setState(() {
+        isLoadingRecommendations = false;
+      });
+    }
+  }
+
+  Future<void> loadWeather({String? city}) async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+      nearbyRecommendations = [];
+    });
+    try {
+      final cityToLoad = city ?? currentCity;
+      final weatherData = await weatherService.getWeather(cityToLoad);
+      setState(() {
+        weather = weatherData;
+        currentCity = cityToLoad;
+        searchController.clear();
+      });
+
+      // Fetch top recommendations for the searched city
+      if (city != null && city.isNotEmpty) {
+        await _fetchTopRecommendations();
+      }
+    } catch (e) {
+      debugPrint('Failed to load weather: $e');
+      setState(() {
+        errorMessage = 'City not found. Please try again.';
+        weather = null;
+        nearbyRecommendations = [];
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _searchCity() {
+    final searchText = searchController.text.trim();
+    if (searchText.isNotEmpty) {
+      loadWeather(city: searchText);
+    }
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF8FAFC),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: const Row(
-          children: [
-            Icon(Icons.explore, color: Color(0xff006591)),
-            SizedBox(width: 8),
-            Text(
-              "TravelWise AI",
-              style: TextStyle(
-                color: Color(0xff006591),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 15),
-            child: CircleAvatar(
-              backgroundImage: NetworkImage(
-                "https://i.pravatar.cc/300",
-              ),
-            ),
-          )
-        ],
-      ),
+
+      // custom app bar
+      appBar: const CustomAppBar(showBackButton: false),
+
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color(0xff006591),
         elevation: 8,
@@ -90,48 +150,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            selectedIndex = index;
-          });
 
-          if (index == 0) {
-            Navigator.pushNamed(context, AppRoutes.messagesScreen);
-          } else if (index == 1) {
-            Navigator.pushNamed(context, AppRoutes.chatbot);
-          } else if (index == 2) {
-            Navigator.pushNamed(context, AppRoutes.itinerary);
-          } else if (index == 3) {
-            Navigator.pushNamed(context, AppRoutes.savedTrips);
-          } else if (index == 4) {
-            Navigator.pushNamed(context, AppRoutes.profileScreen);
-          }
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.chat_bubble_sharp),
-            label: "ChatScreen",
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.search),
-            label: "Explore",
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.map),
-            label: "Trips",
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.bookmark),
-            label: "Saved",
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person),
-            label: "Profile",
-          ),
-        ],
-      ),
+      bottomNavigationBar: const AppBottomNavBar(selectedIndex: 0),
+
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -177,10 +198,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Expanded(
                           child: TextField(
+                            controller: searchController,
+                            onSubmitted: (_) => _searchCity(),
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Colors.white,
-                              hintText: "Search Destination",
+                              hintText: "Search City",
                               prefixIcon: const Icon(Icons.search),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(18),
@@ -198,9 +221,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               vertical: 18,
                             ),
                           ),
-                          onPressed: _goToTripInput,
+                          onPressed: _searchCity,
                           child: const Text(
-                            "Explore",
+                            "Search",
                             style: TextStyle(
                               color: Colors.black,
                             ),
@@ -212,6 +235,48 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Weather in $currentCity',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(height: 12),
+            if (errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    errorMessage!,
+                    style: TextStyle(
+                      color: Colors.red.shade700,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              )
+            else if (isLoading)
+              const Center(
+                child: CircularProgressIndicator(),
+              )
+            else if (weather != null)
+              WeatherCard(weather: weather!)
+            else
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Text("Weather not available"),
+              ),
+            SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -295,46 +360,49 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+            // Show search recommendations if available
+            if (nearbyRecommendations.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Top Recommendations",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff006591),
+                    ),
+                  ),
+                ),
+              ),
+              if (isLoadingRecommendations)
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: CircularProgressIndicator(),
+                )
+              else
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: nearbyRecommendations.length,
+                  itemBuilder: (context, index) {
+                    return RecommendationCard(
+                      item: nearbyRecommendations[index],
+                      onTap: _goToTripInput,
+                    );
+                  },
+                ),
+              const SizedBox(height: 20),
+            ],
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: recommendations.length,
-              itemBuilder: (_, index) {
-                final item = recommendations[index];
-
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(20),
-                        ),
-                        child: Image.network(
-                          item["image"]!,
-                          height: 180,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      ListTile(
-                        title: Text(item["title"]!),
-                        subtitle: Text(
-                          "${item["days"]} • ${item["country"]}",
-                        ),
-                        trailing: const Icon(
-                          Icons.arrow_forward_ios,
-                        ),
-                        onTap: _goToTripInput,
-                      ),
-                    ],
-                  ),
+              itemCount: recommendation.length,
+              itemBuilder: (context, index) {
+                return RecommendationCard(
+                  item: recommendation[index],
+                  onTap: _goToTripInput,
                 );
               },
             ),

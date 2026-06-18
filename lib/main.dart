@@ -13,9 +13,17 @@ import 'providers/trip_provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // await Firebase.initializeApp();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print("database connected sucessfully");
+    
+  } catch (e) {
+    print("Database is not connected");
+    print(e);
+  }
 
   runApp(const SmartItineraryPlanner());
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smart_itinerary_planner/widgets/app_bar.dart';
+import '../widgets/app_bottom_nav_bar.dart';
 
 class SavedTripsScreen extends StatefulWidget {
   const SavedTripsScreen({super.key});
@@ -61,33 +63,11 @@ class _SavedTripsScreenState extends State<SavedTripsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF8FAFC),
+      
 
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Row(
-          children: [
-            Icon(Icons.explore, color: Color(0xff006591)),
-            SizedBox(width: 8),
-            Text(
-              "TravelWise AI",
-              style: TextStyle(
-                color: Color(0xff006591),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: CircleAvatar(
-              backgroundImage:
-                  NetworkImage("https://i.pravatar.cc/300"),
-            ),
-          )
-        ],
-      ),
+      //custom app and bottam bar 
+      appBar: const CustomAppBar(),
+      bottomNavigationBar: const AppBottomNavBar(selectedIndex: 3),
 
       body: Column(
         children: [
