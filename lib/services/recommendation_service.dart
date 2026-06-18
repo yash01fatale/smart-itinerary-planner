@@ -1,89 +1,51 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
 import '../models/recommendation_model.dart';
 
 class RecommendationApiService {
+  static const String baseUrl = 'http://localhost:8000';
 
-  // Replace with your PC IPv4 Address
-  static const String baseUrl =
-      'http://192.168.29.170:8000';
+  Future<List<RecommendationModel>> getPopularDestinations() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/popular-destinations'),
+    );
 
-  Future<List<RecommendationModel>>
-      getPopularDestinations() async {
-    try {
-      final response = await http.get(
-        Uri.parse(
-          '$baseUrl/popular-destinations',
-        ),
-      );
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data =
-            jsonDecode(response.body);
+    print("STATUS CODE: ${response.statusCode}");
+    print("BODY: ${response.body}");
+    
+    if (response.statusCode == 200) {
+  final data = jsonDecode(response.body);
 
-        if (data['success'] == true) {
-          final List<dynamic> destinations =
-              data['destinations'] ?? [];
+  print("API DATA:");
+  print(data);
 
-          return destinations
-              .map(
-                (item) =>
-                    RecommendationModel
-                        .fromJson(item),
-              )
-              .toList();
-        }
+  final List<dynamic> destinations =
+      data['destinations'] ?? [];
 
-        return [];
-      }
+  print(
+      "DESTINATION COUNT = ${destinations.length}");
 
-      throw Exception(
-        'Server Error: ${response.statusCode}',
-      );
-    } catch (e) {
-      print(
-        'Popular Destinations Error: $e',
-      );
-      return [];
+  return destinations
+      .map(
+        (e) => RecommendationModel.fromJson(e),
+      )
+      .toList();
+}
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      final List<dynamic> destinations = data['destinations'] ?? [];
+
+      return destinations
+          .map(
+            (e) => RecommendationModel.fromJson(e),
+          )
+          .toList();
     }
-  }
 
-  Future<List<RecommendationModel>>
-      getTopRecommendations({
-    int topN = 10,
-  }) async {
-    try {
-      final response = await http.get(
-        Uri.parse(
-          '$baseUrl/destinations?top_n=$topN',
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data =
-            jsonDecode(response.body);
-
-        final List<dynamic> destinations =
-            data['destinations'] ?? [];
-
-        return destinations
-            .map(
-              (item) =>
-                  RecommendationModel
-                      .fromJson(item),
-            )
-            .toList();
-      }
-
-      throw Exception(
-        'Failed to load recommendations',
-      );
-    } catch (e) {
-      print(
-        'Recommendation Error: $e',
-      );
-      return [];
-    }
+    throw Exception(
+      'Failed to load destinations',
+    );
   }
 }

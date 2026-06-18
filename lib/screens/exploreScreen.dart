@@ -11,63 +11,32 @@ class ExploreScreen extends StatefulWidget {
   State<ExploreScreen> createState() => _ExploreScreenState();
 }
 
-class _ExploreScreenState extends State<ExploreScreen> {
-  int currentIndex = 1;
+  const String baseUrl =
+    'http://localhost:8000';
 
+class _ExploreScreenState extends State<ExploreScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       appBar: const CustomAppBar(),
-      bottomNavigationBar: const AppBottomNavBar(selectedIndex: 1),
+      bottomNavigationBar:
+          const AppBottomNavBar(selectedIndex: 1),
 
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+          children: [
             SearchSection(),
             CategoryChips(),
-            WeekendGetawaysSection(),
-            // HiddenGemsSection(),
-            // HeritageSection(),
-            // FoodCafeSection(),
-            // BackpackerGuideSection(),
-            SizedBox(height: 80),
+            PopularDestinationsSection(),
+            SizedBox(height: 100),
           ],
         ),
       ),
-    //   bottomNavigationBar: BottomNavigationBar(
-    //     currentIndex: currentIndex,
-    //     selectedItemColor: Color(0xFF006A61),
-    //     unselectedItemColor: Colors.grey,
-    //     onTap: (i) {
-    //       setState(() {
-    //         currentIndex = i;
-    //       });
-    //     },
-    //     items: const [
-    //       BottomNavigationBarItem(
-    //         icon: Icon(Icons.home),
-    //         label: 'Home',
-    //       ),
-    //       BottomNavigationBarItem(
-    //         icon: Icon(Icons.explore),
-    //         label: 'Explore',
-    //       ),
-    //       BottomNavigationBarItem(
-    //         icon: Icon(Icons.bookmark),
-    //         label: 'Saved',
-    //       ),
-    //       BottomNavigationBarItem(
-    //         icon: Icon(Icons.person),
-    //         label: 'Profile',
-    //       ),
-    //     ],
-    //   ),
     );
   }
 }
-
 
 class SearchSection extends StatelessWidget {
   const SearchSection({super.key});
@@ -80,19 +49,23 @@ class SearchSection extends StatelessWidget {
         children: [
           TextField(
             decoration: InputDecoration(
-              hintText: "Search destinations, tours...",
-              prefixIcon: const Icon(Icons.search),
+              hintText:
+                  "Search destinations...",
+              prefixIcon:
+                  const Icon(Icons.search),
               filled: true,
-              fillColor: const Color(0xFFF4F3F2),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide.none,
+              fillColor:
+                  const Color(0xFFF4F3F2),
+              border:
+                  OutlineInputBorder(
+                borderRadius:
+                    BorderRadius.circular(30),
+                borderSide:
+                    BorderSide.none,
               ),
             ),
           ),
-
           const SizedBox(height: 12),
-
           const Row(
             children: [
               Icon(
@@ -111,27 +84,32 @@ class SearchSection extends StatelessWidget {
   }
 }
 
-
 class CategoryChips extends StatelessWidget {
   const CategoryChips({super.key});
 
   @override
   Widget build(BuildContext context) {
     final chips = [
-      "Weekend Getaways",
-      "Hidden Gems",
+      "Popular",
+      "Weekend",
       "Heritage",
-      "Food & Cafe",
-      "Budget Guides",
+      "Food",
+      "Budget",
     ];
 
     return SizedBox(
       height: 50,
       child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        scrollDirection: Axis.horizontal,
+        scrollDirection:
+            Axis.horizontal,
+        padding:
+            const EdgeInsets.symmetric(
+          horizontal: 16,
+        ),
         itemCount: chips.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder:
+            (_, __) =>
+                const SizedBox(width: 8),
         itemBuilder: (context, index) {
           return Chip(
             label: Text(chips[index]),
@@ -150,20 +128,26 @@ class CategoryChips extends StatelessWidget {
   }
 }
 
-class WeekendGetawaysSection extends StatefulWidget {
-  const WeekendGetawaysSection({super.key});
+class PopularDestinationsSection
+    extends StatefulWidget {
+  const PopularDestinationsSection({
+    super.key,
+  });
 
   @override
-  State<WeekendGetawaysSection> createState() =>
-      _WeekendGetawaysSectionState();
+  State<PopularDestinationsSection>
+      createState() =>
+          _PopularDestinationsSectionState();
 }
 
-class _WeekendGetawaysSectionState
-    extends State<WeekendGetawaysSection> {
+class _PopularDestinationsSectionState
+    extends State<
+        PopularDestinationsSection> {
   final RecommendationApiService api =
       RecommendationApiService();
 
-  List<RecommendationModel> destinations = [];
+  List<RecommendationModel>
+      destinations = [];
 
   bool isLoading = true;
 
@@ -174,28 +158,35 @@ class _WeekendGetawaysSectionState
   }
 
   Future<void> loadDestinations() async {
-    try {
-      final data =
-          await api.getPopularDestinations();
+  try {
+    final data =
+        await api.getPopularDestinations();
 
-      setState(() {
-        destinations = data;
-        isLoading = false;
-      });
-    } catch (e) {
-      print("Explore Error: $e");
+    print(
+        "LOADED DESTINATIONS = ${data.length}");
 
-      setState(() {
-        isLoading = false;
-      });
+    for (var item in data) {
+      print(item.title);
     }
+
+    setState(() {
+      destinations = data;
+      isLoading = false;
+    });
+  } catch (e) {
+    print("Explore Error: $e");
+
+    setState(() {
+      isLoading = false;
+    });
   }
+}
 
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
       return const SizedBox(
-        height: 250,
+        height: 300,
         child: Center(
           child:
               CircularProgressIndicator(),
@@ -205,7 +196,7 @@ class _WeekendGetawaysSectionState
 
     if (destinations.isEmpty) {
       return const SizedBox(
-        height: 250,
+        height: 300,
         child: Center(
           child: Text(
             "No destinations found",
@@ -223,7 +214,7 @@ class _WeekendGetawaysSectionState
           child: Text(
             "Popular Destinations",
             style: TextStyle(
-              fontSize: 28,
+              fontSize: 26,
               fontWeight:
                   FontWeight.bold,
             ),
@@ -231,20 +222,16 @@ class _WeekendGetawaysSectionState
         ),
 
         SizedBox(
-          height: 300,
-
+          height: 320,
           child: ListView.builder(
             scrollDirection:
                 Axis.horizontal,
-
-            itemCount:
-                destinations.length,
-
             padding:
                 const EdgeInsets.symmetric(
               horizontal: 16,
             ),
-
+            itemCount:
+                destinations.length,
             itemBuilder:
                 (context, index) {
               final place =
@@ -255,13 +242,9 @@ class _WeekendGetawaysSectionState
                     const EdgeInsets.only(
                   right: 16,
                 ),
-
-                child: DestinationCard(
-                  title: place.title,
-                  subtitle:
-                      place.description,
-                  imageUrl:
-                      place.thumbnail,
+                child:
+                    DestinationCard(
+                  destination: place,
                 ),
               );
             },
@@ -272,61 +255,70 @@ class _WeekendGetawaysSectionState
   }
 }
 
-class DestinationCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String imageUrl;
+class DestinationCard
+    extends StatelessWidget {
+  final RecommendationModel
+      destination;
 
   const DestinationCard({
     super.key,
-    required this.title,
-    required this.subtitle,
-    required this.imageUrl,
+    required this.destination,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: 280,
-
       child: Card(
-        elevation: 4,
-
+        elevation: 5,
         clipBehavior:
             Clip.antiAlias,
-
         shape:
             RoundedRectangleBorder(
           borderRadius:
-              BorderRadius.circular(16),
+              BorderRadius.circular(18),
         ),
-
         child: Column(
           crossAxisAlignment:
               CrossAxisAlignment.start,
-
           children: [
             Expanded(
               child: Image.network(
-                imageUrl,
-
+                destination.thumbnail,
                 width:
                     double.infinity,
-
                 fit: BoxFit.cover,
 
+                loadingBuilder: (
+                  context,
+                  child,
+                  progress,
+                ) {
+                  if (progress ==
+                      null) {
+                    return child;
+                  }
+
+                  return const Center(
+                    child:
+                        CircularProgressIndicator(),
+                  );
+                },
+
                 errorBuilder:
-                    (context,
-                        error,
-                        stackTrace) {
+                    (
+                      context,
+                      error,
+                      stackTrace,
+                    ) {
                   return Container(
                     color:
-                        Colors.grey.shade200,
-
-                    child: const Center(
+                        Colors.grey[300],
+                    child:
+                        const Center(
                       child: Icon(
                         Icons.image,
-                        size: 50,
+                        size: 60,
                       ),
                     ),
                   );
@@ -337,20 +329,16 @@ class DestinationCard extends StatelessWidget {
             Padding(
               padding:
                   const EdgeInsets.all(12),
-
               child: Column(
                 crossAxisAlignment:
                     CrossAxisAlignment.start,
-
                 children: [
                   Text(
-                    title,
-
+                    destination.title,
                     maxLines: 1,
-
                     overflow:
-                        TextOverflow.ellipsis,
-
+                        TextOverflow
+                            .ellipsis,
                     style:
                         const TextStyle(
                       fontWeight:
@@ -360,23 +348,53 @@ class DestinationCard extends StatelessWidget {
                   ),
 
                   const SizedBox(
-                    height: 4,
+                    height: 6,
                   ),
 
                   Text(
-                    subtitle,
-
+                    destination
+                        .description,
                     maxLines: 2,
-
                     overflow:
-                        TextOverflow.ellipsis,
-
+                        TextOverflow
+                            .ellipsis,
                     style:
                         TextStyle(
                       color:
-                          Colors.grey[700],
+                          Colors.grey[
+                              700],
                     ),
                   ),
+
+                  const SizedBox(
+                    height: 10,
+                  ),
+
+                  if (destination
+                      .flightPrice
+                      .isNotEmpty)
+                    Text(
+                      "✈ ${destination.flightPrice}",
+                      style:
+                          const TextStyle(
+                        fontWeight:
+                            FontWeight
+                                .w600,
+                      ),
+                    ),
+
+                  if (destination
+                      .hotelPrice
+                      .isNotEmpty)
+                    Text(
+                      "🏨 ${destination.hotelPrice}",
+                      style:
+                          const TextStyle(
+                        fontWeight:
+                            FontWeight
+                                .w600,
+                      ),
+                    ),
                 ],
               ),
             ),

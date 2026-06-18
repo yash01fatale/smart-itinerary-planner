@@ -1,31 +1,30 @@
-class DestinationModel {
-  final String name;
+class RecommendationModel {
+  final String title;
   final String description;
-  final String image;
   final String link;
   final String flightPrice;
   final double? extractedFlightPrice;
   final String hotelPrice;
   final double? extractedHotelPrice;
+  final String thumbnail;
 
-  DestinationModel({
-    required this.name,
+  RecommendationModel({
+    required this.title,
     required this.description,
-    required this.image,
     required this.link,
     required this.flightPrice,
     required this.extractedFlightPrice,
     required this.hotelPrice,
     required this.extractedHotelPrice,
+    required this.thumbnail,
   });
 
-  factory DestinationModel.fromJson(
+  factory RecommendationModel.fromJson(
     Map<String, dynamic> json,
   ) {
-    return DestinationModel(
-      name: json['name'] ?? '',
+    return RecommendationModel(
+      title: json['title'] ?? '',
       description: json['description'] ?? '',
-      image: json['image'] ?? '',
       link: json['link'] ?? '',
       flightPrice: json['flight_price'] ?? '',
       extractedFlightPrice:
@@ -35,6 +34,7 @@ class DestinationModel {
       extractedHotelPrice:
           (json['extracted_hotel_price'] as num?)
               ?.toDouble(),
+      thumbnail: json['thumbnail'] ?? '',
     );
   }
 }

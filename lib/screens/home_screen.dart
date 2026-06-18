@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> fetchRecommendations() async {
     try {
       recommendation =
-          await RecommendationApiService().getTopRecommendations(topN: 10);
+          await RecommendationApiService().getPopularDestinations();
     } catch (e) {
       debugPrint('Failed to fetch recommendations: $e');
       recommendation = [];
@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       nearbyRecommendations =
-          await RecommendationApiService().getTopRecommendations(topN: 10);
+          await RecommendationApiService().getPopularDestinations();
     } catch (e) {
       debugPrint('Failed to fetch recommendations: $e');
       nearbyRecommendations = [];

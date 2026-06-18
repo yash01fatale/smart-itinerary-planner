@@ -14,6 +14,7 @@ class RecommendationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 4,
       margin: const EdgeInsets.symmetric(
         horizontal: 16,
         vertical: 8,
@@ -21,102 +22,126 @@ class RecommendationCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
-                ),
-                child: Image.network(
-                  item.thumbnail,
-                  height: 180,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(
+                top: Radius.circular(20),
               ),
-              // Location badge - show city and country
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        Colors.black87,
-                        Colors.transparent,
-                      ],
+              child: Image.network(
+                item.thumbnail,
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder:
+                    (
+                      context,
+                      error,
+                      stackTrace,
+                    ) {
+                      return Container(
+                        height: 200,
+                        color: Colors.grey.shade300,
+                        child: const Center(
+                          child: Icon(
+                            Icons.image_not_supported,
+                            size: 50,
+                          ),
+                        ),
+                      );
+                    },
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.title,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight:
+                          FontWeight.bold,
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                  const SizedBox(height: 8),
+
+                  Text(
+                    item.description,
+                    maxLines: 2,
+                    overflow:
+                        TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  Row(
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.city,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                      if (item.flightPrice
+                          .isNotEmpty)
+                        Container(
+                          padding:
+                              const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration:
+                              BoxDecoration(
+                            color:
+                                Colors.blue.shade50,
+                            borderRadius:
+                                BorderRadius.circular(
+                              20,
                             ),
                           ),
-                          if (item.country.isNotEmpty)
-                            Text(
-                              item.country,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
+                          child: Text(
+                            "✈ ${item.flightPrice}",
+                          ),
+                        ),
+
+                      const SizedBox(width: 8),
+
+                      if (item.hotelPrice
+                          .isNotEmpty)
+                        Container(
+                          padding:
+                              const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration:
+                              BoxDecoration(
+                            color: Colors
+                                .green.shade50,
+                            borderRadius:
+                                BorderRadius.circular(
+                              20,
                             ),
-                        ],
-                      ),
+                          ),
+                          child: Text(
+                            "🏨 ${item.hotelPrice}",
+                          ),
+                        ),
                     ],
                   ),
-                ),
-              ),
-            ],
-          ),
-          ListTile(
-            isThreeLine: true,
-            title: Text(
-              item.title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
+                ],
               ),
             ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(item.description),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 4,
-                  children: [
-                    if (item.flightPrice.isNotEmpty)
-                      Text('Flight: ${item.flightPrice}'),
-                    if (item.hotelPrice.isNotEmpty)
-                      Text('Hotel: ${item.hotelPrice}'),
-                  ],
-                ),
-              ],
-            ),
-            trailing: const Icon(
-              Icons.arrow_forward_ios,
-            ),
-            onTap: onTap,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
