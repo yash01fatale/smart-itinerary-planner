@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:smart_itinerary_planner/widgets/app_bar.dart';
 import '../widgets/app_bottom_nav_bar.dart';
+import '../services/recommendation_service.dart';
+import '../models/recommendation_model.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -148,49 +150,121 @@ class CategoryChips extends StatelessWidget {
   }
 }
 
-class WeekendGetawaysSection extends StatelessWidget {
+class WeekendGetawaysSection extends StatefulWidget {
   const WeekendGetawaysSection({super.key});
 
   @override
+  State<WeekendGetawaysSection> createState() =>
+      _WeekendGetawaysSectionState();
+}
+
+class _WeekendGetawaysSectionState
+    extends State<WeekendGetawaysSection> {
+  final RecommendationApiService api =
+      RecommendationApiService();
+
+  List<RecommendationModel> destinations = [];
+
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadDestinations();
+  }
+
+  Future<void> loadDestinations() async {
+    try {
+      final data =
+          await api.getPopularDestinations();
+
+      setState(() {
+        destinations = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Explore Error: $e");
+
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const SizedBox(
+        height: 250,
+        child: Center(
+          child:
+              CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (destinations.isEmpty) {
+      return const SizedBox(
+        height: 250,
+        child: Center(
+          child: Text(
+            "No destinations found",
+          ),
+        ),
+      );
+    }
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
       children: [
         const Padding(
           padding: EdgeInsets.all(16),
           child: Text(
-            "Weekend Getaways",
+            "Popular Destinations",
             style: TextStyle(
               fontSize: 28,
-              fontWeight: FontWeight.bold,
+              fontWeight:
+                  FontWeight.bold,
             ),
           ),
         ),
 
         SizedBox(
-          height: 280,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            children: const [
-              DestinationCard(
-                title: "Ellora & Ajanta",
-                subtitle: "Ancient Wonders",
-                imageUrl: "IMAGE_URL",
-              ),
-              SizedBox(width: 16),
-              DestinationCard(
-                title: "Nashik Vineyards",
-                subtitle: "Wine & Relaxation",
-                imageUrl: "IMAGE_URL",
-              ),
-              SizedBox(width: 16),
-              DestinationCard(
-                title: "Lonavala",
-                subtitle: "Misty Hills",
-                imageUrl: "IMAGE_URL",
-              ),
-            ],
+          height: 300,
+
+          child: ListView.builder(
+            scrollDirection:
+                Axis.horizontal,
+
+            itemCount:
+                destinations.length,
+
+            padding:
+                const EdgeInsets.symmetric(
+              horizontal: 16,
+            ),
+
+            itemBuilder:
+                (context, index) {
+              final place =
+                  destinations[index];
+
+              return Padding(
+                padding:
+                    const EdgeInsets.only(
+                  right: 16,
+                ),
+
+                child: DestinationCard(
+                  title: place.title,
+                  subtitle:
+                      place.description,
+                  imageUrl:
+                      place.thumbnail,
+                ),
+              );
+            },
           ),
         ),
       ],
@@ -214,34 +288,95 @@ class DestinationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 280,
+
       child: Card(
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+        elevation: 4,
+
+        clipBehavior:
+            Clip.antiAlias,
+
+        shape:
+            RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.circular(16),
         ),
+
         child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+
           children: [
             Expanded(
               child: Image.network(
                 imageUrl,
+
+                width:
+                    double.infinity,
+
                 fit: BoxFit.cover,
-                width: double.infinity,
+
+                errorBuilder:
+                    (context,
+                        error,
+                        stackTrace) {
+                  return Container(
+                    color:
+                        Colors.grey.shade200,
+
+                    child: const Center(
+                      child: Icon(
+                        Icons.image,
+                        size: 50,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
+
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding:
+                  const EdgeInsets.all(12),
+
               child: Column(
                 crossAxisAlignment:
                     CrossAxisAlignment.start,
+
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
+
+                    maxLines: 1,
+
+                    overflow:
+                        TextOverflow.ellipsis,
+
+                    style:
+                        const TextStyle(
+                      fontWeight:
+                          FontWeight.bold,
+                      fontSize: 18,
                     ),
                   ),
-                  Text(subtitle),
+
+                  const SizedBox(
+                    height: 4,
+                  ),
+
+                  Text(
+                    subtitle,
+
+                    maxLines: 2,
+
+                    overflow:
+                        TextOverflow.ellipsis,
+
+                    style:
+                        TextStyle(
+                      color:
+                          Colors.grey[700],
+                    ),
+                  ),
                 ],
               ),
             ),
