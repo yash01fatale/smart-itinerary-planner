@@ -8,6 +8,7 @@ import '../widgets/weather_card.dart';
 import '../models/weather_data.dart';
 import '../models/recommendation_model.dart';
 import '../widgets/recommendation_card.dart';
+import 'package:smart_itinerary_planner/screens/exploreScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -221,7 +222,16 @@ class _HomeScreenState extends State<HomeScreen> {
                               vertical: 18,
                             ),
                           ),
-                          onPressed: _searchCity,
+                          onPressed: () async {
+                            _searchCity();
+
+                            if (searchController.text.isNotEmpty) {
+                              Navigator.pushNamed(
+                                context,
+                                AppRoutes.explore,
+                              );
+                            }
+                          },
                           child: const Text(
                             "Search",
                             style: TextStyle(
@@ -270,7 +280,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: CircularProgressIndicator(),
               )
             else if (weather != null)
-              WeatherCard(weather: weather!)
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.explore,
+                  );
+                },
+                child: WeatherCard(
+                  weather: weather!,
+                ),
+              )
             else
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
@@ -290,7 +310,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.explore,
+                      );
+                    },
                     child: const Text("View All"),
                   )
                 ],
@@ -310,12 +335,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       top: 5,
                       bottom: 5,
                     ),
-                    child: Chip(
-                      avatar: Icon(
-                        category["icon"],
-                        color: const Color(0xff006591),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.explore,
+                        );
+                      },
+                      child: Chip(
+                        avatar: Icon(
+                          category["icon"],
+                          color: const Color(0xff006591),
+                        ),
+                        label: Text(category["title"]),
                       ),
-                      label: Text(category["title"]),
                     ),
                   );
                 },
@@ -334,16 +367,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            Container(
-              height: 250,
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25),
-                image: const DecorationImage(
-                  image: NetworkImage(
-                    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.tripInput,
+                );
+              },
+              child: Container(
+                height: 250,
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                  image: const DecorationImage(
+                    image: NetworkImage(
+                      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+                    ),
+                    fit: BoxFit.cover,
                   ),
-                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -388,8 +429,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: nearbyRecommendations.length,
                   itemBuilder: (context, index) {
                     return RecommendationCard(
-                      item: nearbyRecommendations[index],
-                      onTap: _goToTripInput,
+                      item: recommendation[index],
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.tripInput,
+                          arguments: recommendation[index],
+                        );
+                      },
                     );
                   },
                 ),

@@ -16,6 +16,7 @@ class AppRoutes {
   static const splash = '/';
   static const onboarding = '/onboarding';
   static const login = '/login';
+  static const explore = '/explore';
   static const signup = '/signup';
   static const forgotPassword = '/forgot-password';
   static const home = '/home';
@@ -40,6 +41,6 @@ class AppRoutes {
         savedTrips: (_) => const SavedTripsScreen(),
         messagesScreen: (_) => const MessagesScreen(),
         profileScreen: (_) => const ProfileScreen(),
-        exploreScreen: (_) => const ExploreScreen(),
+        explore: (_) => const ExploreScreen(),
       };
 }

@@ -1,35 +1,37 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../models/recommendation_model.dart';
 
-class RecommendationService {
+class RecommendationApiService {
+  static const String baseUrl =
+      'http://localhost:8000/destinations';
 
-  static const baseUrl =
-      'http://localhost:5000/api';
-
-  Future<List<dynamic>>
-      getRecommendations({
-    required int travelers,
-    required int days,
-    required int budget,
-    required String category,
+  static Future<List<RecommendationModel>> getTopRecommendations({
+    int topN = 10,
   }) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl?top_n=$topN'),
+      );
 
-    final response =
-        await http.post(
-      Uri.parse(
-          '$baseUrl/recommendations'),
-      headers: {
-        'Content-Type':
-            'application/json',
-      },
-      body: jsonEncode({
-        'travelers': travelers,
-        'days': days,
-        'budget': budget,
-        'category': category,
-      }),
-    );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
 
-    return jsonDecode(response.body);
+        final List<dynamic> destinations =
+            data['destinations'] ?? [];
+
+        return destinations
+            .map(
+              (item) => RecommendationModel.fromJson(item),
+            )
+            .toList();
+      }
+
+      throw Exception(
+        'Failed to load recommendations: ${response.statusCode}',
+      );
+    } catch (e) {
+      throw Exception('Recommendation API Error: $e');
+    }
   }
 }
