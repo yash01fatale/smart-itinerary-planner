@@ -402,58 +402,115 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             // Show search recommendations if available
-            if (nearbyRecommendations.isNotEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Top Recommendations",
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xff006591),
-                    ),
-                  ),
+            SizedBox(
+              height: 350,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: recommendation.length,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
                 ),
+                itemBuilder: (context, index) {
+                  return SizedBox(
+                      width: 300,
+                      child: RecommendationCard(
+                        item: recommendation[index],
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes. destinationDetails,
+                            arguments: recommendation[index],
+                          );
+                        },
+                      ));
+                },
               ),
-              if (isLoadingRecommendations)
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: CircularProgressIndicator(),
-                )
-              else
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: nearbyRecommendations.length,
-                  itemBuilder: (context, index) {
-                    return RecommendationCard(
-                      item: recommendation[index],
-                      onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          AppRoutes.tripInput,
-                          arguments: recommendation[index],
-                        );
-                      },
-                    );
-                  },
-                ),
-              const SizedBox(height: 20),
-            ],
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: recommendation.length,
-              itemBuilder: (context, index) {
-                return RecommendationCard(
-                  item: recommendation[index],
-                  onTap: _goToTripInput,
-                );
-              },
             ),
             const SizedBox(height: 100),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class RecommendationCard extends StatelessWidget {
+  final RecommendationModel item;
+  final VoidCallback onTap;
+
+  const RecommendationCard({
+    super.key,
+    required this.item,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 6,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 6,
+              child: Image.network(
+                item.thumbnail,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: const Center(
+                      child: Icon(
+                        Icons.image,
+                        size: 60,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Expanded(
+              flex: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 6,
+                    ),
+                    Text(
+                      item.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Spacer(),
+                    if (item.flightPrice.isNotEmpty)
+                      Text(
+                        "✈ ${item.flightPrice}",
+                      ),
+                    if (item.hotelPrice.isNotEmpty)
+                      Text(
+                        "🏨 ${item.hotelPrice}",
+                      ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),

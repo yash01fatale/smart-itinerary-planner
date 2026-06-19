@@ -3,8 +3,9 @@ import 'package:http/http.dart' as http;
 import '../models/recommendation_model.dart';
 
 class RecommendationApiService {
-  static const String baseUrl = 'http://localhost:8000';
-
+static const String baseUrl =
+    'http://127.0.0.1:8000';
+    
   Future<List<RecommendationModel>> getPopularDestinations() async {
     final response = await http.get(
       Uri.parse('$baseUrl/popular-destinations'),

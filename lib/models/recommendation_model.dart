@@ -19,22 +19,16 @@ class RecommendationModel {
     required this.thumbnail,
   });
 
-  factory RecommendationModel.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory RecommendationModel.fromJson(Map<String, dynamic> json) {
     return RecommendationModel(
-      title: json['title'] ?? '',
+      title: json['title'] ?? json['name'] ?? '',
       description: json['description'] ?? '',
       link: json['link'] ?? '',
       flightPrice: json['flight_price'] ?? '',
-      extractedFlightPrice:
-          (json['extracted_flight_price'] as num?)
-              ?.toDouble(),
+      extractedFlightPrice: (json['extracted_flight_price'] as num?)?.toDouble(),
       hotelPrice: json['hotel_price'] ?? '',
-      extractedHotelPrice:
-          (json['extracted_hotel_price'] as num?)
-              ?.toDouble(),
-      thumbnail: json['thumbnail'] ?? '',
+      extractedHotelPrice: (json['extracted_hotel_price'] as num?)?.toDouble(),
+      thumbnail: json['thumbnail'] ?? json['image'] ?? '',
     );
   }
 }

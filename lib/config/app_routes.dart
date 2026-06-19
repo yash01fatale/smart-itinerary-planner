@@ -11,6 +11,7 @@ import '../screens/trip_input_screen.dart';
 import '../screens/saved_trips_screen.dart';
 import '../screens/messageScreens/Message_screen.dart';
 import '../screens/intialScreens/profile/profile_screen.dart';
+import '../screens/destination_details_screen.dart';
 
 class AppRoutes {
   static const splash = '/';
@@ -21,6 +22,8 @@ class AppRoutes {
   static const forgotPassword = '/forgot-password';
   static const home = '/home';
   static const destination = "/destination";
+static const destinationDetails =
+    '/destination-details';
   static const tripInput = "/tripInput";
   static const destinationDetail = "/destinationDetail";
   static const trips = "/trips";
@@ -42,5 +45,6 @@ class AppRoutes {
         messagesScreen: (_) => const MessagesScreen(),
         profileScreen: (_) => const ProfileScreen(),
         explore: (_) => const ExploreScreen(),
+        destinationDetails: (_) => const DestinationDetails(),
       };
 }
