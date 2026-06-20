@@ -26,7 +26,7 @@ class WeatherService {
         city: data['name'],
         temp: data['main']['temp'].toDouble(),
         description: data['weather'][0]['description'],
-        icon: data['weather'][0]['icon'],
+        icon: data['weather'][0]['icon'], humidity: data['main']['humidity'],
       );
     } else {
       throw Exception('Failed to load weather');

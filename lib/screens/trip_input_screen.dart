@@ -11,6 +11,12 @@ class TripInputScreen extends StatefulWidget {
 }
 
 class _TripInputScreenState extends State<TripInputScreen> {
+  int get tripDays {
+    if (startDate == null || endDate == null) return 1;
+
+    return endDate!.difference(startDate!).inDays + 1;
+  }
+
   final TextEditingController destinationController = TextEditingController();
 
   final TextEditingController travelerController = TextEditingController();
@@ -236,16 +242,45 @@ class _TripInputScreenState extends State<TripInputScreen> {
                   backgroundColor: const Color(0xffFBBF24),
                 ),
                 onPressed: () {
-                  print({
-                    "destination": destinationController.text,
-                    "category": selectedCategory,
-                    "startDate": startDate.toString(),
-                    "endDate": endDate.toString(),
-                    "travelers": travelerController.text,
-                    "budget": budget.toInt(),
-                  });
+                  if (destinationController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Enter destination"),
+                      ),
+                    );
+                    return;
+                  }
 
-                  // Navigator.pushNamed();
+                  if (startDate == null || endDate == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Select travel dates"),
+                      ),
+                    );
+                    return;
+                  }
+
+                  if (travelerController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Enter travelers count"),
+                      ),
+                    );
+                    return;
+                  }
+
+                  Navigator.pushNamed(
+                    context,
+                    '/loading',
+                    arguments: {
+                      "destination": destinationController.text,
+                      "category": selectedCategory,
+                      "travelers": travelerController.text,
+                      "budget": budget.toInt(),
+                      "startDate": startDate.toString(),
+                      "endDate": endDate.toString(),
+                    },
+                  );
                 },
               ),
             ),

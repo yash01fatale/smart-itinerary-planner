@@ -12,6 +12,9 @@ import '../screens/saved_trips_screen.dart';
 import '../screens/messageScreens/Message_screen.dart';
 import '../screens/intialScreens/profile/profile_screen.dart';
 import '../screens/destination_details_screen.dart';
+import '../screens/loading_screen.dart';
+import '../screens/itinerary_screen.dart';
+import '../screens/nearby_places_screen.dart';
 
 class AppRoutes {
   static const splash = '/';
@@ -22,13 +25,16 @@ class AppRoutes {
   static const forgotPassword = '/forgot-password';
   static const home = '/home';
   static const destination = "/destination";
-static const destinationDetails =
-    '/destination-details';
+  static const destinationDetails = '/destination-details';
+  static const itinerary = '/itinerary';
+  static const nearbyPlaces = '/nearby-places';
+
   static const tripInput = "/tripInput";
   static const destinationDetail = "/destinationDetail";
   static const trips = "/trips";
   static const savedTrips = "/savedTrips";
   static const profileScreen = "/profile";
+  static const loading = "/loading";
   static const chatbot = "/chatbot";
   static const messagesScreen = "/chatscreen";
   static const exploreScreen = "/explore";
@@ -46,5 +52,8 @@ static const destinationDetails =
         profileScreen: (_) => const ProfileScreen(),
         explore: (_) => const ExploreScreen(),
         destinationDetails: (_) => const DestinationDetails(),
+        loading: (_) => const LoadingScreen(),
+        itinerary: (_) => const ItineraryScreen(),
+        nearbyPlaces: (_) => const NearbyPlacesScreen(),
       };
 }

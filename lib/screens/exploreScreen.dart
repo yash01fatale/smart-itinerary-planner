@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:smart_itinerary_planner/widgets/app_bar.dart';
 import '../widgets/app_bottom_nav_bar.dart';
 import '../services/recommendation_service.dart';
@@ -14,68 +17,93 @@ class ExploreScreen extends StatefulWidget {
 const String baseUrl = 'http://127.0.0.1:8000';
 
 class _ExploreScreenState extends State<ExploreScreen> {
+  final TextEditingController searchController = TextEditingController();
+  String selectedCategory = "Popular";
+  List<RecommendationModel> searchResults = [];
+
+  bool isSearching = false;
+  Future<void> searchDestination(
+    String query,
+  ) async {
+    if (query.isEmpty) {
+      setState(() {
+        searchResults = [];
+      });
+      return;
+    }
+
+    setState(() {
+      isSearching = true;
+    });
+
+    try {
+      final result = await RecommendationApiService().searchDestinations(query);
+
+      setState(() {
+        searchResults = result;
+        isSearching = false;
+      });
+    } catch (e) {
+      setState(() {
+        isSearching = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(),
       bottomNavigationBar: const AppBottomNavBar(selectedIndex: 1),
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SearchSection(),
-            CategoryChips(),
-            PopularDestinationsSection(),
-            SizedBox(height: 100),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SearchSection extends StatelessWidget {
-  const SearchSection({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          TextField(
-            decoration: InputDecoration(
-              hintText: "Search destinations...",
-              prefixIcon: const Icon(Icons.search),
-              filled: true,
-              fillColor: const Color(0xFFF4F3F2),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide.none,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              controller: searchController,
+              onChanged: (value) {
+                searchDestination(value);
+              },
+              decoration: InputDecoration(
+                hintText: "Search Any Destination...",
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          const Row(
-            children: [
-              Icon(
-                Icons.location_on,
-                color: Color(0xFF8D4B00),
-              ),
-              SizedBox(width: 4),
-              Text(
-                "Near Chhatrapati Sambhajinagar",
-              ),
-            ],
+          CategoryChips(
+  selectedCategory: selectedCategory ?? "Popular",
+            onCategorySelected: (category) {
+              setState(() {
+                selectedCategory = category;
+              });
+            },
           ),
-        ],
+          searchController.text.isNotEmpty
+              ? SearchResultsSection(
+                  destinations: searchResults,
+                )
+              : PopularDestinationsSection(
+                  category: selectedCategory,
+                ),
+        ]),
       ),
     );
   }
 }
 
 class CategoryChips extends StatelessWidget {
-  const CategoryChips({super.key});
+final String? selectedCategory;
+
+  final Function(String) onCategorySelected;
+
+  const CategoryChips({
+    super.key,
+    required this.selectedCategory,
+    required this.onCategorySelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -88,21 +116,34 @@ class CategoryChips extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: 50,
-      child: ListView.separated(
+      height: 55,
+      child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(
           horizontal: 16,
         ),
         itemCount: chips.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
-          return Chip(
-            label: Text(chips[index]),
-            backgroundColor:
-                index == 0 ? const Color(0xFF8D4B00) : const Color(0xFF86F2E4),
-            labelStyle: TextStyle(
-              color: index == 0 ? Colors.white : const Color(0xFF006F66),
+          final category = chips[index];
+
+final isSelected =
+    category == (selectedCategory ?? "Popular");
+          return Padding(
+            padding: const EdgeInsets.only(
+              right: 10,
+            ),
+            child: ChoiceChip(
+              label: Text(category),
+              selected: isSelected,
+              onSelected: (_) {
+                onCategorySelected(category);
+              },
+              selectedColor: const Color(0xFF8D4B00),
+              backgroundColor: const Color(0xFF86F2E4),
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.white : const Color(0xFF006F66),
+                fontWeight: FontWeight.w600,
+              ),
             ),
           );
         },
@@ -111,14 +152,20 @@ class CategoryChips extends StatelessWidget {
   }
 }
 
-class PopularDestinationsSection extends StatefulWidget {
+class PopularDestinationsSection
+    extends StatefulWidget {
+
+  final String category;
+
   const PopularDestinationsSection({
     super.key,
+    required this.category,
   });
 
   @override
-  State<PopularDestinationsSection> createState() =>
-      _PopularDestinationsSectionState();
+  State<PopularDestinationsSection>
+      createState() =>
+          _PopularDestinationsSectionState();
 }
 
 class _PopularDestinationsSectionState
@@ -128,6 +175,18 @@ class _PopularDestinationsSectionState
   List<RecommendationModel> destinations = [];
 
   bool isLoading = true;
+  @override
+void didUpdateWidget(
+  covariant PopularDestinationsSection
+      oldWidget,
+) {
+  super.didUpdateWidget(oldWidget);
+
+  if (oldWidget.category !=
+      widget.category) {
+    loadDestinations();
+  }
+}
 
   @override
   void initState() {
@@ -138,15 +197,48 @@ class _PopularDestinationsSectionState
   Future<void> loadDestinations() async {
     try {
       final data = await api.getPopularDestinations();
+      List<RecommendationModel> filtered =
+    data;
 
-      print("LOADED DESTINATIONS = ${data.length}");
+switch (widget.category) {
+  case "Weekend":
+    filtered = data
+        .where((e) =>
+            e.title.contains("Goa") ||
+            e.title.contains("Udaipur"))
+        .toList();
+    break;
 
-      for (var item in data) {
-        print(item.title);
-      }
+  case "Heritage":
+    filtered = data
+        .where((e) =>
+            e.title.contains("Agra") ||
+            e.title.contains("Jaipur") ||
+            e.title.contains("Varanasi"))
+        .toList();
+    break;
+
+  case "Food":
+    filtered = data
+        .where((e) =>
+            e.title.contains("Mumbai") ||
+            e.title.contains("Delhi"))
+        .toList();
+    break;
+
+  case "Budget":
+    filtered = data
+        .where((e) =>
+            e.hotelPrice.isNotEmpty)
+        .toList();
+    break;
+
+  default:
+    filtered = data;
+}
 
       setState(() {
-        destinations = data;
+        destinations = filtered;
         isLoading = false;
       });
     } catch (e) {
@@ -208,7 +300,9 @@ class _PopularDestinationsSectionState
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(
+            height: 20,
+          ),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -217,102 +311,90 @@ class _PopularDestinationsSectionState
               crossAxisCount: crossAxisCount,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              childAspectRatio: 0.78,
+              childAspectRatio: 0.82,
             ),
             itemBuilder: (context, index) {
-              final destination = destinations[index];
+              return DestinationCard(
+                destination: destinations[index],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-              return Card(
-                elevation: 6,
-                clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 6,
-                      child: Image.network(
-                        destination.thumbnail,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (
-                          context,
-                          child,
-                          progress,
-                        ) {
-                          if (progress == null) {
-                            return child;   
-                          }
+class SearchResultsSection extends StatelessWidget {
+  final List<RecommendationModel> destinations;
 
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        },
-                        errorBuilder: (
-                          context,
-                          error,
-                          stackTrace,
-                        ) {
-                          return Container(
-                            color: Colors.grey[300],
-                            child: const Center(
-                              child: Icon(
-                                Icons.image,
-                                size: 60,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      flex: 4,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              destination.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              destination.description,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                                fontSize: 13,
-                              ),
-                            ),
-                            const Spacer(),
-                            if (destination.flightPrice.isNotEmpty)
-                              Text(
-                                "✈ ${destination.flightPrice}",
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            if (destination.hotelPrice.isNotEmpty)
-                              Text(
-                                "🏨 ${destination.hotelPrice}",
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+  const SearchResultsSection({
+    super.key,
+    required this.destinations,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    int crossAxisCount = 2;
+
+    if (screenWidth > 1400) {
+      crossAxisCount = 5;
+    } else if (screenWidth > 1000) {
+      crossAxisCount = 4;
+    } else if (screenWidth > 700) {
+      crossAxisCount = 3;
+    }
+
+    if (destinations.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(30),
+        child: Center(
+          child: Text(
+            "No destinations found",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Search Results",
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            "${destinations.length} destinations found",
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: destinations.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 0.82,
+            ),
+            itemBuilder: (context, index) {
+              return DestinationCard(
+                destination: destinations[index],
               );
             },
           ),
@@ -343,7 +425,7 @@ class DestinationCard extends StatelessWidget {
           Navigator.pushNamed(
             context,
             '/destination-details',
-            arguments: destination
+            arguments: destination,
           );
         },
         child: Column(
@@ -355,7 +437,9 @@ class DestinationCard extends StatelessWidget {
                 children: [
                   Image.network(
                     destination.thumbnail,
+                    width: double.infinity,
                     fit: BoxFit.cover,
+                    filterQuality: FilterQuality.high,
                     loadingBuilder: (
                       context,
                       child,
@@ -375,7 +459,7 @@ class DestinationCard extends StatelessWidget {
                       stackTrace,
                     ) {
                       return Container(
-                        color: Colors.grey[300],
+                        color: Colors.grey.shade300,
                         child: const Center(
                           child: Icon(
                             Icons.image,

@@ -28,6 +28,7 @@ def home():
         "message": "Smart Itinerary Planner Backend"
     }
 
+
 @app.get("/destination-image")
 def destination_image(place: str):
     return {
@@ -83,6 +84,50 @@ def popular_destinations(
             "error": str(e)
         }
 
+@app.get("/search-destinations")
+def search_destinations(query: str):
+
+    try:
+
+        search = GoogleSearch({
+            "engine": "google",
+            "q": f"{query} tourist destination",
+            "api_key": SERP_API_KEY
+        })
+
+        results = search.get_dict()
+
+        destinations = []
+
+        for item in results.get(
+            "organic_results",
+            []
+        )[:10]:
+
+            destinations.append({
+                "title": item.get("title", ""),
+                "description": item.get("description", ""),
+                "thumbnail": item.get(
+                    "thumbnail",
+                    f"https://source.unsplash.com/800x600/?{query}"
+                ),
+                "link": item.get("link", ""),
+                "flight_price": item.get("flight_price", ""),
+                "hotel_price": item.get("hotel_price", ""),
+            })
+
+        return {
+            "success": True,
+            "count": len(destinations),
+            "destinations": destinations
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+    
 DESTINATION_IMAGES = {
     "Mumbai": "https://images.unsplash.com/photo-1570168007204-dfb528c6958f",
     "Jaipur": "https://images.unsplash.com/photo-1477587458883-47145ed94245",

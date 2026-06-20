@@ -247,22 +247,18 @@ class ItineraryModel {
 // lib/models/weather_model.dart
 class WeatherModel {
   final String description;
-  final double temperature;
-  final double feelsLike;
+  final double temp;
   final int humidity;
-  final double windSpeed;
   final String icon;
-  final DateTime date;
+  final String city;
 
   WeatherModel({
-    required this.description, required this.temperature, required this.feelsLike,
-    required this.humidity, required this.windSpeed, required this.icon, required this.date,
+    required this.description, required this.temp, 
+    required this.humidity,  required this.icon, required this.city,
   });
 
   factory WeatherModel.fromMap(Map<String, dynamic> map) => WeatherModel(
-    description: map['description'] ?? '', temperature: (map['temperature'] ?? 0).toDouble(),
-    feelsLike: (map['feelsLike'] ?? 0).toDouble(), humidity: map['humidity'] ?? 0,
-    windSpeed: (map['windSpeed'] ?? 0).toDouble(), icon: map['icon'] ?? '',
-    date: DateTime.parse(map['date'] ?? DateTime.now().toIso8601String()),
+    description: map['description'] ?? '', temp: (map['temp'] ?? 0).toDouble(),
+    humidity: map['humidity'] ?? 0, icon: map['icon'] ?? '', city: map['city'] ?? '',
   );
 }
