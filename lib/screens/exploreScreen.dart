@@ -242,7 +242,7 @@ class _PopularDestinationsSectionState
                           progress,
                         ) {
                           if (progress == null) {
-                            return child;
+                            return child;   
                           }
 
                           return const Center(
