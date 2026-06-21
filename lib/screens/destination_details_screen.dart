@@ -5,6 +5,44 @@ class DestinationDetails extends StatelessWidget {
   const DestinationDetails({
     super.key,
   });
+  Future<void> openGoogleMaps(String place) async {
+    final Uri url = Uri.parse(
+      "https://www.google.com/maps/search/?api=1&query=$place",
+    );
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(
+        url,
+        mode: LaunchMode.externalApplication,
+      );
+    }
+  }
+
+  Future<void> openFlights(
+    String destination,
+  ) async {
+    final Uri url = Uri.parse(
+      "https://www.google.com/travel/flights",
+    );
+
+    await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
+  Future<void> openHotels(
+    String destination,
+  ) async {
+    final Uri url = Uri.parse(
+      "https://www.google.com/travel/hotels/$destination",
+    );
+
+    await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,57 +122,92 @@ class DestinationDetails extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.teal.shade50,
-                      borderRadius: BorderRadius.circular(
-                        16,
+                  InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () {
+                      openGoogleMaps(destination.title);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.teal.shade50,
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.location_on,
-                          color: Colors.red,
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        Expanded(
-                          child: Text(
-                            destination.title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on,
+                            color: Colors.red,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  destination.title,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  "Tap to open in Google Maps",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                      ],
+                          const Icon(
+                            Icons.open_in_new,
+                            color: Colors.teal,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 25),
                   Row(
                     children: [
                       Expanded(
-                        child: _infoCard(
-                          Icons.flight,
-                          "Flight",
-                          destination.flightPrice.isEmpty
-                              ? "N/A"
-                              : destination.flightPrice,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(15),
+                          onTap: () {
+                            openFlights(
+                              destination.title,
+                            );
+                          },
+                          child: _infoCard(
+                            Icons.flight,
+                            "Flights",
+                            destination.flightPrice.isEmpty
+                                ? "Search"
+                                : destination.flightPrice,
+                          ),
                         ),
                       ),
                       const SizedBox(
                         width: 12,
                       ),
                       Expanded(
-                        child: _infoCard(
-                          Icons.hotel,
-                          "Hotel",
-                          destination.hotelPrice.isEmpty
-                              ? "N/A"
-                              : destination.hotelPrice,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(15),
+                          onTap: () {
+                            openHotels(
+                              destination.title,
+                            );
+                          },
+                          child: _infoCard(
+                            Icons.hotel,
+                            "Hotels",
+                            destination.hotelPrice.isEmpty
+                                ? "Search"
+                                : destination.hotelPrice,
+                          ),
                         ),
                       ),
                     ],
@@ -238,12 +311,17 @@ class DestinationDetails extends StatelessWidget {
                       "Scenic Spot",
                     ]
                         .map(
-                          (e) => Chip(
+                          (place) => ActionChip(
                             avatar: const Icon(
                               Icons.place,
-                              size: 18,
+                              color: Colors.red,
                             ),
-                            label: Text(e),
+                            label: Text(place),
+                            onPressed: () {
+                              openGoogleMaps(
+                                "$place ${destination.title}",
+                              );
+                            },
                           ),
                         )
                         .toList(),
@@ -357,10 +435,17 @@ class DestinationDetails extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: Colors.grey.shade300,
+        ),
       ),
       child: Column(
         children: [
-          Icon(icon, size: 32),
+          Icon(
+            icon,
+            size: 32,
+            color: Colors.teal,
+          ),
           const SizedBox(height: 8),
           Text(
             title,
@@ -368,8 +453,17 @@ class DestinationDetails extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(value),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          const Icon(
+            Icons.open_in_new,
+            size: 18,
+            color: Colors.grey,
+          ),
         ],
       ),
     );
