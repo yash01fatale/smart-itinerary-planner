@@ -13,7 +13,6 @@ import '../screens/messageScreens/Message_screen.dart';
 import '../screens/intialScreens/profile/profile_screen.dart';
 import '../screens/destination_details_screen.dart';
 import '../screens/loading_screen.dart';
-import '../screens/itinerary_screen.dart';
 import '../screens/nearby_places_screen.dart';
 
 class AppRoutes {
@@ -53,7 +52,7 @@ class AppRoutes {
         explore: (_) => const ExploreScreen(),
         destinationDetails: (_) => const DestinationDetails(),
         loading: (_) => const LoadingScreen(),
-        itinerary: (_) => const ItineraryScreen(),
+       
         nearbyPlaces: (_) => const NearbyPlacesScreen(),
       };
 }

@@ -153,8 +153,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     final userId = user.id;
 
                     final name = data['name'] ?? 'Unknown User';
-                    final isSelf =
-                        userId == FirebaseAuth.instance.currentUser?.uid;
                     final email = data['email'] ?? '';
                     final photoUrl = data['photoUrl'] ?? '';
 

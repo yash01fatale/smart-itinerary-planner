@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:smart_itinerary_planner/widgets/app_bar.dart';
 import '../widgets/app_bottom_nav_bar.dart';
 import '../services/recommendation_service.dart';
@@ -74,7 +71,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
             ),
           ),
           CategoryChips(
-  selectedCategory: selectedCategory ?? "Popular",
+  selectedCategory: selectedCategory,
             onCategorySelected: (category) {
               setState(() {
                 selectedCategory = category;
@@ -518,52 +515,58 @@ class DestinationCard extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    Row(
-                      children: [
-                        if (destination.flightPrice.isNotEmpty)
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.blue.shade50,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                "✈ ${destination.flightPrice}",
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Row(
+                        children: [
+                          if (destination.flightPrice.isNotEmpty)
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade50,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  "✈ ${destination.flightPrice}",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        if (destination.flightPrice.isNotEmpty &&
-                            destination.hotelPrice.isNotEmpty)
-                          const SizedBox(width: 8),
-                        if (destination.hotelPrice.isNotEmpty)
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.green.shade50,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                "🏨 ${destination.hotelPrice}",
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
+                          if (destination.flightPrice.isNotEmpty &&
+                              destination.hotelPrice.isNotEmpty)
+                            const SizedBox(width: 8),
+                          if (destination.hotelPrice.isNotEmpty)
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade50,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  "🏨 ${destination.hotelPrice}",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),

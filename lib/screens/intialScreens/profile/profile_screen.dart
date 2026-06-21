@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:smart_itinerary_planner/config/app_routes.dart';
 import 'package:smart_itinerary_planner/screens/intialScreens/profile/edit_profile.dart';
 
 import '../../../widgets/app_bottom_nav_bar.dart';
@@ -41,7 +40,6 @@ class ProfileScreen extends StatelessWidget {
           final data = snapshot.data!.data() as Map<String, dynamic>;
 
           final name = data['name'] ?? 'Unknown User';
-          final email = data['email'] ?? '';
           final photoUrl = data['photoUrl'] ?? '';
           final bio = data['bio'] ?? 'No bio available';
 

@@ -1,290 +1,132 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:smart_itinerary_planner/widgets/app_bar.dart';
-import '../widgets/app_bottom_nav_bar.dart';
+
+import '../services/itinerary_api.dart';
+import '../models/day_plan.dart';
+import '../screens/ItineraryScreen.dart';
 
 class TripInputScreen extends StatefulWidget {
   const TripInputScreen({super.key});
 
   @override
-  State<TripInputScreen> createState() => _TripInputScreenState();
+  State<TripInputScreen> createState() =>
+      _TripInputScreenState();
 }
 
-class _TripInputScreenState extends State<TripInputScreen> {
-  int get tripDays {
-    if (startDate == null || endDate == null) return 1;
+class _TripInputScreenState
+    extends State<TripInputScreen> {
+  final destinationController =
+      TextEditingController();
 
-    return endDate!.difference(startDate!).inDays + 1;
-  }
+  final daysController =
+      TextEditingController();
 
-  final TextEditingController destinationController = TextEditingController();
+  bool isLoading = false;
 
-  final TextEditingController travelerController = TextEditingController();
-
-  String selectedCategory = "Beach";
-
-  DateTime? startDate;
-  DateTime? endDate;
-
-  double budget = 25000;
-
-  final List<String> categories = [
-    "Beach",
-    "Hill Station",
-    "Mountains",
-    "Historical",
-    "Adventure",
-    "Wildlife",
-    "Religious",
-  ];
-
-  Future<void> pickStartDate() async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2035),
-    );
-
-    if (picked != null) {
+  Future<void> generateTrip() async {
+    try {
       setState(() {
-        startDate = picked;
+        isLoading = true;
       });
-    }
-  }
 
-  Future<void> pickEndDate() async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: startDate ?? DateTime.now(),
-      firstDate: startDate ?? DateTime.now(),
-      lastDate: DateTime(2035),
-    );
+      final result =
+          await ItineraryApi.generateItinerary(
+        destination:
+            destinationController.text,
+        days:
+            int.parse(daysController.text),
+      );
 
-    if (picked != null) {
-      setState(() {
-        endDate = picked;
-      });
+      final itinerary =
+          (result["itinerary"] as List)
+              .map(
+                (e) => DayPlan.fromJson(e),
+              )
+              .toList();
+
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              ItineraryScreen(
+            itinerary: itinerary,
+          ),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
     }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF8FAFC),
-
-      // custom app and the bottam bar
-      appBar: CustomAppBar(
-        showBackButton: false,
+      appBar: AppBar(
+        title: const Text(
+          "Smart Itinerary Planner",
+        ),
       ),
-      bottomNavigationBar: const AppBottomNavBar(selectedIndex: 2),
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+      body: Padding(
+        padding:
+            const EdgeInsets.all(20),
         child: Column(
           children: [
-            Container(
-              height: 220,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25),
-                image: const DecorationImage(
-                  image: NetworkImage(
-                    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-                  ),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            const SizedBox(height: 25),
             TextField(
-              controller: destinationController,
-              decoration: InputDecoration(
-                labelText: "Destination",
-                prefixIcon: const Icon(Icons.location_on),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
+              controller:
+                  destinationController,
+              decoration:
+                  const InputDecoration(
+                labelText:
+                    "Destination",
+                border:
+                    OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 20),
-            DropdownButtonFormField(
-              value: selectedCategory,
-              decoration: InputDecoration(
-                labelText: "Category",
-                prefixIcon: const Icon(Icons.category),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-              items: categories.map((category) {
-                return DropdownMenuItem(
-                  value: category,
-                  child: Text(category),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedCategory = value!;
-                });
-              },
+            const SizedBox(
+              height: 20,
             ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: pickStartDate,
-                    child: Container(
-                      padding: const EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.grey.shade400,
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Column(
-                        children: [
-                          const Icon(Icons.calendar_month),
-                          const SizedBox(height: 8),
-                          Text(
-                            startDate == null
-                                ? "Start Date"
-                                : DateFormat('dd MMM yyyy').format(startDate!),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 15),
-                Expanded(
-                  child: InkWell(
-                    onTap: pickEndDate,
-                    child: Container(
-                      padding: const EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.grey.shade400,
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Column(
-                        children: [
-                          const Icon(Icons.event),
-                          const SizedBox(height: 8),
-                          Text(
-                            endDate == null
-                                ? "End Date"
-                                : DateFormat('dd MMM yyyy').format(endDate!),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
             TextField(
-              controller: travelerController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: "Travelers",
-                prefixIcon: const Icon(Icons.groups),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
+              controller:
+                  daysController,
+              keyboardType:
+                  TextInputType.number,
+              decoration:
+                  const InputDecoration(
+                labelText:
+                    "Days",
+                border:
+                    OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 30),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "Budget",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  "₹${budget.toInt()}",
-                  style: const TextStyle(
-                    color: Colors.blue,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )
-              ],
+            const SizedBox(
+              height: 30,
             ),
-            Slider(
-              value: budget,
-              min: 2000,
-              max: 100000,
-              divisions: 98,
-              label: budget.toInt().toString(),
-              onChanged: (value) {
-                setState(() {
-                  budget = value;
-                });
-              },
-            ),
-            const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
-              height: 60,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.smart_toy),
-                label: const Text(
-                  "Generate Itinerary",
+              height: 55,
+              child:
+                  ElevatedButton(
+                onPressed:
+                    isLoading
+                        ? null
+                        : generateTrip,
+                child: Text(
+                  isLoading
+                      ? "Generating..."
+                      : "Generate Itinerary",
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xffFBBF24),
-                ),
-                onPressed: () {
-                  if (destinationController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Enter destination"),
-                      ),
-                    );
-                    return;
-                  }
-
-                  if (startDate == null || endDate == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Select travel dates"),
-                      ),
-                    );
-                    return;
-                  }
-
-                  if (travelerController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Enter travelers count"),
-                      ),
-                    );
-                    return;
-                  }
-
-                  Navigator.pushNamed(
-                    context,
-                    '/loading',
-                    arguments: {
-                      "destination": destinationController.text,
-                      "category": selectedCategory,
-                      "travelers": travelerController.text,
-                      "budget": budget.toInt(),
-                      "startDate": startDate.toString(),
-                      "endDate": endDate.toString(),
-                    },
-                  );
-                },
               ),
             ),
-            const SizedBox(height: 30),
           ],
         ),
       ),

@@ -22,7 +22,6 @@ Future<void> main() async {
     
   } catch (e) {
     print("Database is not connected");
-    print(e);
   }
 
   runApp(const SmartItineraryPlanner());

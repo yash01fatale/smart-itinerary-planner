@@ -7,8 +7,6 @@ import '../services/weather_service.dart';
 import '../widgets/weather_card.dart';
 import '../models/weather_data.dart';
 import '../models/recommendation_model.dart';
-import '../widgets/recommendation_card.dart';
-import 'package:smart_itinerary_planner/screens/exploreScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -187,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Your Next Adventure,\nAI-Perfected",
+                      "Your Next Adventure,,\nAI-Perfected",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 34,

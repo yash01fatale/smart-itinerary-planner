@@ -73,9 +73,7 @@ class _SavedTripsScreenState extends State<SavedTripsScreen> {
       backgroundColor: const Color(0xffF8FAFC),
 
       //custom app and bottam bar
-      appBar: AppBar(
-  title: const Text("Saved Trips"),
-),
+      appBar: CustomAppBar(showBackButton: false,),
 bottomNavigationBar: const SizedBox(),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color(0xffFBBF24),

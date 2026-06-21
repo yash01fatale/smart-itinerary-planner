@@ -1,7 +1,13 @@
+from urllib import request
+
+from backend.models import generate_daywise_itinerary
+from backend.models import rank_attractions
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from serpapi import GoogleSearch
 from dotenv import load_dotenv
+from pydantic import BaseModel
+
 import os
 
 load_dotenv()
@@ -9,6 +15,13 @@ load_dotenv()
 app = FastAPI(
     title="Smart Itinerary Planner API"
 )
+
+
+
+class ItineraryRequest(BaseModel):
+    destination: str
+    days: int
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -140,3 +153,99 @@ DESTINATION_IMAGES = {
     "Kolkata": "https://images.unsplash.com/photo-1558431382-27e303142255",
     "Chennai": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220"
 }
+
+
+
+
+def fetch_attractions(destination: str):
+
+    search = GoogleSearch({
+        "engine": "google_maps",
+        "q": f"tourist attractions in {destination}",
+        "type": "search",
+        "api_key": SERP_API_KEY
+    })
+
+    results = search.get_dict()
+
+    attractions = []
+
+    for place in results.get("local_results", []):
+
+        attractions.append({
+            "name": place.get("title"),
+            "rating": place.get("rating", 0),
+            "reviews": place.get("reviews", 0),
+            "address": place.get("address", ""),
+            "thumbnail":place.get("thumbnail",""),
+        })
+
+    return attractions
+
+
+
+
+@app.post("/generate-itinerary")
+def create_itinerary(request: ItineraryRequest):
+
+    print("Destination:", request.destination)
+    print("Days:", request.days)
+
+    attractions = fetch_attractions(
+        request.destination
+    )
+
+    print(
+        "Attractions Found:",
+        len(attractions)
+    )
+
+    ranked = rank_attractions(
+        attractions
+    )
+
+    itinerary = []
+
+    places_per_day = max(
+        1,
+        len(ranked) // request.days
+    )
+
+    index = 0
+
+    for day in range(request.days):
+
+        day_places = ranked[
+            index:index + places_per_day
+        ]
+
+        itinerary.append({
+            "day": day + 1,
+            "places": day_places
+        })
+
+        index += places_per_day
+
+    if index < len(ranked):
+        itinerary[-1]["places"].extend(
+            ranked[index:]
+        )
+
+    return {
+        "success": True,
+        "destination": request.destination,
+        "days": request.days,
+        "itinerary": itinerary
+    }
+
+
+
+# if __name__ == "__main__":
+#     result  =ItineraryRequest("mumbai,2")
+#     res = fetch_attractions(result)
+#     # print(res)
+#     itin = create_itinerary(res,2)
+#     print(itin)
+
+
+
