@@ -40,10 +40,4 @@ cd smart-itinerary-planner
 
 
 
- // Use this URL for your local backend
-  // For Local Development: http://localhost:8000
-  // For Android Emulator: http://10.0.2.2:8000
-  // For Physical Device: http://YOUR_IP:8000
-  static const String baseUrl = 'http://localhost:8000';
-  // static const String baseUrl = 'http://10.0.2.2:8000';  // Android emulator only
-  // static const String baseUrl = 'http://192.168.1.100:8000';  // Physical device - update IP
+
