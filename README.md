@@ -37,7 +37,3 @@ An AI-powered mobile application that generates structured travel itineraries ba
 ```bash
 git clone https://github.com/yourusername/smart-itinerary-planner.git
 cd smart-itinerary-planner
-
-
-
-
