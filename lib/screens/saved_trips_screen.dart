@@ -332,6 +332,10 @@ class _SavedTripsScreenState extends State<SavedTripsScreen> {
                       '/itinerary',
                       arguments: {
                         "destination": trip["title"],
+                        "image": trip["image"],
+                        "days": 3,
+                        "travelers": 2,
+                        "budget": 25000,
                       },
                     );
                   },
@@ -344,7 +348,17 @@ class _SavedTripsScreenState extends State<SavedTripsScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.share),
-                      onPressed: () {},
+                      onPressed: () {
+                        Share.share(
+                          '''
+${trip["name"]}
+
+${trip["description"]}
+
+Explore with TravelWise AI
+      ''',
+                        );
+                      },
                     ),
                     IconButton(
                       icon: const Icon(
