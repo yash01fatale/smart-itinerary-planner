@@ -29,6 +29,7 @@ class ItineraryScreen extends StatelessWidget {
     final budget = tripData?["budget"] ?? 25000;
 
     final travelers = tripData?["travelers"] ?? 2;
+    final image = tripData?["image"] ?? "";
 
     final itinerary = [
       [
@@ -74,16 +75,6 @@ class ItineraryScreen extends StatelessWidget {
                         Icons.location_on,
                       ),
                       const SizedBox(width: 10),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: Image.network(
-                          "https://source.unsplash.com/800x400/?$destination",
-                          height: 200,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      const SizedBox(height: 15),
                       Expanded(
                         child: Text(
                           destination,
@@ -94,6 +85,38 @@ class ItineraryScreen extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 15),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: image.isNotEmpty
+                        ? Container(
+                            height: 220,
+                            width: double.infinity,
+                            margin: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              image: DecorationImage(
+                                image: NetworkImage(image),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          )
+                        : Container(
+                            height: 220,
+                            width: double.infinity,
+                            margin: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.image,
+                                size: 60,
+                              ),
+                            ),
+                          ),
                   ),
                   const SizedBox(height: 10),
                   Row(

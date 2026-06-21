@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_itinerary_planner/widgets/app_bar.dart';
 import '../widgets/app_bottom_nav_bar.dart';
+import 'package:share_plus/share_plus.dart';
 
 class SavedTripsScreen extends StatefulWidget {
   const SavedTripsScreen({super.key});
@@ -69,20 +70,34 @@ class _SavedTripsScreenState extends State<SavedTripsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tripData =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    final destination = tripData?["destination"] ?? "Goa";
+
+    final image = tripData?["image"] ?? "";
+
+    final description = tripData?["description"] ?? "";
+
+    final days = tripData?["days"] ?? 3;
+
+    final budget = tripData?["budget"] ?? 25000;
+
+    final travelers = tripData?["travelers"] ?? 2;
     return Scaffold(
       backgroundColor: const Color(0xffF8FAFC),
 
       //custom app and bottam bar
       appBar: AppBar(
-  title: const Text("Saved Trips"),
-),
-bottomNavigationBar: const SizedBox(),
+        title: const Text("Saved Trips"),
+      ),
+      bottomNavigationBar: const SizedBox(),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color(0xffFBBF24),
         onPressed: () {
           Navigator.pushNamed(
             context,
-            '/trip-input',
+            '/tripInput',
           );
         },
         icon: const Icon(
@@ -93,96 +108,114 @@ bottomNavigationBar: const SizedBox(),
         ),
       ),
 
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Your Collections",
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "Personalized itineraries curated by your AI assistant.",
+              style: TextStyle(
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildTabs(),
+            const SizedBox(height: 20),
+            Row(
               children: [
-                const Text(
-                  "Your Collections",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: _buildStatCard(
+                    "Trips",
+                    trips.length.toString(),
+                    Icons.flight_takeoff,
                   ),
                 ),
-                const SizedBox(height: 5),
-                const Text(
-                  "Personalized itineraries curated by your AI assistant.",
-                  style: TextStyle(color: Colors.grey),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _tabButton(
-                        title: "Upcoming",
-                        selected: isUpcoming,
-                        onTap: () {
-                          setState(() {
-                            isUpcoming = true;
-                          });
-                        },
-                      ),
-                      _tabButton(
-                        title: "Past",
-                        selected: !isUpcoming,
-                        onTap: () {
-                          setState(() {
-                            isUpcoming = false;
-                          });
-                        },
-                      ),
-                    ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildStatCard(
+                    "Saved",
+                    "24",
+                    Icons.bookmark,
                   ),
                 ),
-                const SizedBox(height: 20),
-                TextField(
-                  onChanged: (value) {
-                    setState(() {
-                      searchText = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: "Search saved destinations...",
-                    prefixIcon: const Icon(Icons.search),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildStatCard(
+                    "Days",
+                    "42",
+                    Icons.calendar_month,
                   ),
                 ),
               ],
             ),
-          ),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: filteredTrips.length + 1,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,
-                childAspectRatio: 1.15,
-                mainAxisSpacing: 16,
-              ),
-              itemBuilder: (context, index) {
-                if (index == filteredTrips.length) {
-                  return _buildNewTripCard();
-                }
-
-                final trip = filteredTrips[index];
-
-                return _buildTripCard(trip);
+            const SizedBox(height: 20),
+            TextField(
+              onChanged: (value) {
+                setState(() {
+                  searchText = value;
+                });
               },
+              decoration: InputDecoration(
+                hintText: "Search saved destinations...",
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
+            const SizedBox(height: 20),
+            ...filteredTrips.map(
+              (trip) => Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: _buildTripCard(trip),
+              ),
+            ),
+            const SizedBox(height: 80),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabs() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _tabButton(
+            title: "Upcoming",
+            selected: isUpcoming,
+            onTap: () {
+              setState(() {
+                isUpcoming = true;
+              });
+            },
+          ),
+          _tabButton(
+            title: "Past",
+            selected: !isUpcoming,
+            onTap: () {
+              setState(() {
+                isUpcoming = false;
+              });
+            },
           ),
         ],
       ),
@@ -217,111 +250,111 @@ bottomNavigationBar: const SizedBox(),
   }
 
   Widget _buildTripCard(Map<String, dynamic> trip) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
+    return Container(
+      height: 150,
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          )
+        ],
       ),
-      child: Column(
+      child: Row(
         children: [
-          Expanded(
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(20),
-                  ),
-                  child: Image.network(
-                    trip["image"] ?? "",
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (
-                      context,
-                      error,
-                      stackTrace,
-                    ) {
-                      return Container(
-                        color: Colors.grey.shade300,
-                        child: const Center(
-                          child: Icon(
-                            Icons.image,
-                            size: 50,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: Icon(
-                      Icons.bookmark,
-                      color: const Color(0xff006591),
-                    ),
-                  ),
-                ),
-              ],
+          ClipRRect(
+            borderRadius: const BorderRadius.horizontal(
+              left: Radius.circular(20),
+            ),
+            child: Image.network(
+              trip["image"],
+              width: 180,
+              height: double.infinity,
+              fit: BoxFit.cover,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  trip["title"] ?? "Unknown Trip",
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    trip["title"],
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    trip["description"],
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const Spacer(),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on,
+                        size: 18,
+                        color: Colors.red,
+                      ),
+                      Text(trip["spots"]),
+                      const SizedBox(width: 20),
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 18,
+                        color: Colors.blue,
+                      ),
+                      Text(trip["days"]),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 110,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/itinerary',
+                      arguments: {
+                        "destination": trip["title"],
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.visibility, size: 16),
+                  label: const Text("View"),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  trip["description"] ?? "No description available.",
-                  style: const TextStyle(color: Colors.grey),
-                ),
-                const SizedBox(height: 15),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.location_on, size: 16),
-                    Text(trip["spots"] ?? "0 Spots"),
-                    const SizedBox(width: 15),
-                    const Icon(Icons.calendar_today, size: 16),
-                    Text(trip["days"] ?? "0 Days"),
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
+                      onPressed: () {},
+                    ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.visibility,
-                        ),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.edit,
-                          color: Colors.blue,
-                        ),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.delete,
-                          color: Colors.red,
-                        ),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
-                )
               ],
             ),
           )
@@ -396,7 +429,12 @@ bottomNavigationBar: const SizedBox(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xffFBBF24),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  '/trip-input',
+                );
+              },
               child: const Text(
                 "Start Planning",
                 style: TextStyle(color: Colors.black),
@@ -413,28 +451,38 @@ bottomNavigationBar: const SizedBox(),
     String value,
     IconData icon,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            color: const Color(0xff006591),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+    return SizedBox(
+      height: 100,
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 24,
+                  color: const Color(0xff006591),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(title),
+              ],
             ),
           ),
-          Text(title),
-        ],
+        ),
       ),
     );
   }
