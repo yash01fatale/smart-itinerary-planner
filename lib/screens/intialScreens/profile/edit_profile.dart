@@ -214,235 +214,248 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         title: const Text("Edit Profile"),
         centerTitle: true,
       ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-
-              GestureDetector(
-  onTap: pickImage,
-  child: CircleAvatar(
-    radius: 60,
-    backgroundImage:
-        imageFile != null ? FileImage(imageFile!) : null,
-    child: imageFile == null
-        ? const Icon(Icons.person, size: 60)
-        : null,
-  ),
-),
-
-              const SizedBox(height: 20),
-
-              buildCard(
-                Column(
-                  children: [
-                    TextFormField(
-                      controller: nameController,
-                      validator: (v) =>
-                          v!.isEmpty
-                              ? "Enter Name"
-                              : null,
-                      decoration:
-                          const InputDecoration(
-                        labelText: "Full Name",
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      controller: bioController,
-                      maxLines: 4,
-                      decoration:
-                          const InputDecoration(
-                        labelText: "Bio",
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              buildCard(
-                Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Traveler Personality",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: availableTags
-                          .map((tag) {
-                        return FilterChip(
-                          label: Text(tag),
-                          selected: selectedTags
-                              .contains(tag),
-                          onSelected: (value) {
-                            setState(() {
-                              if (value) {
-                                selectedTags
-                                    .add(tag);
-                              } else {
-                                selectedTags
-                                    .remove(tag);
-                              }
-                            });
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              buildCard(
-                Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                  children: [
-
-                    const Text(
-                      "Travel Preferences",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    DropdownButtonFormField(
-                      value: travelStyle,
-                      decoration:
-                          const InputDecoration(
-                        labelText:
-                            "Travel Style",
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'Adventure',
-                          child: Text(
-                              '🏔 Adventure'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Relaxation',
-                          child: Text(
-                              '🏖 Relaxation'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Cultural',
-                          child:
-                              Text('🎭 Cultural'),
-                        ),
-                      ],
-                      onChanged: (v) {
-                        setState(() {
-                          travelStyle =
-                              v.toString();
-                        });
-                      },
-                    ),
-
-                    const SizedBox(height: 15),
-
-                    DropdownButtonFormField(
-                      value: transport,
-                      decoration:
-                          const InputDecoration(
-                        labelText:
-                            "Transport",
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'Flight',
-                          child:
-                              Text('✈️ Flight'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Train',
-                          child:
-                              Text('🚆 Train'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Road Trip',
-                          child: Text(
-                              '🚗 Road Trip'),
-                        ),
-                      ],
-                      onChanged: (v) {
-                        setState(() {
-                          transport =
-                              v.toString();
-                        });
-                      },
-                    ),
-
-                    const SizedBox(height: 15),
-
-                    DropdownButtonFormField(
-                      value: budget,
-                      decoration:
-                          const InputDecoration(
-                        labelText: "Budget",
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'Budget',
-                          child:
-                              Text('₹ Budget'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Mid',
-                          child: Text(
-                              '₹₹ Mid Range'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Luxury',
-                          child:
-                              Text('₹₹₹ Luxury'),
-                        ),
-                      ],
-                      onChanged: (v) {
-                        setState(() {
-                          budget =
-                              v.toString();
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed:
-                      isSaving ? null : saveProfile,
-                  child: isSaving
-                      ? const CircularProgressIndicator()
-                      : const Text(
-                          "Save Changes",
-                        ),
-                ),
-              ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF4FC3F7),
+              Color(0xFFE3F2FD),
+              Colors.white,
             ],
+          ),
+        ),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+        
+                GestureDetector(
+          onTap: pickImage,
+          child: CircleAvatar(
+            radius: 60,
+            backgroundImage:
+          imageFile != null ? FileImage(imageFile!) : null,
+            child: imageFile == null
+          ? const Icon(Icons.person, size: 60)
+          : null,
+          ),
+        ),
+        
+                const SizedBox(height: 20),
+        
+                buildCard(
+                  Column(
+                    children: [
+                      TextFormField(
+                        controller: nameController,
+                        validator: (v) =>
+                            v!.isEmpty
+                                ? "Enter Name"
+                                : null,
+                        decoration:
+                            const InputDecoration(
+                          labelText: "Full Name",
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        controller: bioController,
+                        maxLines: 4,
+                        decoration:
+                            const InputDecoration(
+                          labelText: "Bio",
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+        
+                const SizedBox(height: 20),
+        
+                buildCard(
+                  Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Traveler Personality",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+        
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: availableTags
+                            .map((tag) {
+                          return FilterChip(
+                            label: Text(tag),
+                            selected: selectedTags
+                                .contains(tag),
+                            onSelected: (value) {
+                              setState(() {
+                                if (value) {
+                                  selectedTags
+                                      .add(tag);
+                                } else {
+                                  selectedTags
+                                      .remove(tag);
+                                }
+                              });
+                            },
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+        
+                const SizedBox(height: 20),
+        
+                buildCard(
+                  Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                    children: [
+        
+                      const Text(
+                        "Travel Preferences",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+        
+                      const SizedBox(height: 20),
+        
+                      DropdownButtonFormField(
+                        value: travelStyle,
+                        decoration:
+                            const InputDecoration(
+                          labelText:
+                              "Travel Style",
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'Adventure',
+                            child: Text(
+                                '🏔 Adventure'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Relaxation',
+                            child: Text(
+                                '🏖 Relaxation'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Cultural',
+                            child:
+                                Text('🎭 Cultural'),
+                          ),
+                        ],
+                        onChanged: (v) {
+                          setState(() {
+                            travelStyle =
+                                v.toString();
+                          });
+                        },
+                      ),
+        
+                      const SizedBox(height: 15),
+        
+                      DropdownButtonFormField(
+                        value: transport,
+                        decoration:
+                            const InputDecoration(
+                          labelText:
+                              "Transport",
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'Flight',
+                            child:
+                                Text('✈️ Flight'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Train',
+                            child:
+                                Text('🚆 Train'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Road Trip',
+                            child: Text(
+                                '🚗 Road Trip'),
+                          ),
+                        ],
+                        onChanged: (v) {
+                          setState(() {
+                            transport =
+                                v.toString();
+                          });
+                        },
+                      ),
+        
+                      const SizedBox(height: 15),
+        
+                      DropdownButtonFormField(
+                        value: budget,
+                        decoration:
+                            const InputDecoration(
+                          labelText: "Budget",
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'Budget',
+                            child:
+                                Text('₹ Budget'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Mid',
+                            child: Text(
+                                '₹₹ Mid Range'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Luxury',
+                            child:
+                                Text('₹₹₹ Luxury'),
+                          ),
+                        ],
+                        onChanged: (v) {
+                          setState(() {
+                            budget =
+                                v.toString();
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+        
+                const SizedBox(height: 30),
+        
+                SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: ElevatedButton(
+                    onPressed:
+                        isSaving ? null : saveProfile,
+                    child: isSaving
+                        ? const CircularProgressIndicator()
+                        : const Text(
+                            "Save Changes",
+                          ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

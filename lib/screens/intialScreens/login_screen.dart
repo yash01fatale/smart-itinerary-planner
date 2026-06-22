@@ -102,8 +102,8 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           /// Background Image
           Positioned.fill(
-            child: Image.network(
-              "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+            child: Image.asset(
+              "assets/images/onboarding1.png",
               fit: BoxFit.cover,
             ),
           ),

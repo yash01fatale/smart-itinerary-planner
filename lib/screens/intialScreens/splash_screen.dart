@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen>
     /// Logo Animation
     _logoController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 30000),
     );
 
     _scaleAnimation = Tween<double>(
@@ -107,8 +107,8 @@ class _SplashScreenState extends State<SplashScreen>
               );
             },
             child: SizedBox.expand(
-              child: Image.network(
-                "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1500&q=80",
+              child: Image.asset(
+                "assets/images/splash.png",
                 fit: BoxFit.cover,
               ),
             ),

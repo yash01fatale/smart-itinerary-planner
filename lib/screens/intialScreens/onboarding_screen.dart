@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../config/app_routes.dart';
+import '../../config/app_routes.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});

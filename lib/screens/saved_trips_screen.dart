@@ -25,6 +25,12 @@ class _SavedTripsScreenState extends State<SavedTripsScreen> {
     }).toList();
   }
 
+   void _deleteTrip(Map<String, dynamic> trip) {
+    setState(() {
+      trips.remove(trip);
+    });
+  }
+
   final List<Map<String, dynamic>> trips = [
     {
       "title": "3-Day Tokyo Exploration",
@@ -88,15 +94,11 @@ class _SavedTripsScreenState extends State<SavedTripsScreen> {
       backgroundColor: const Color(0xffF8FAFC),
 
       //custom app and bottam bar
-<<<<<<< HEAD
-      appBar: CustomAppBar(showBackButton: false,),
-bottomNavigationBar: const SizedBox(),
-=======
-      appBar: AppBar(
-        title: const Text("Saved Trips"),
+      appBar: CustomAppBar(),
+      bottomNavigationBar: AppBottomNavBar(
+        selectedIndex: 3,
       ),
-      bottomNavigationBar: const SizedBox(),
->>>>>>> 6b356e22e0c5971674deb0de72b6c5132675adcf
+
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color(0xffFBBF24),
         onPressed: () {
@@ -113,82 +115,97 @@ bottomNavigationBar: const SizedBox(),
         ),
       ),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Your Collections",
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
+      
+
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFBFE9FF),
+              Color(0xFFEAF8FF),
+              Color(0xFFFFFFFF),
+            ],
+          ),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Your Collections",
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              "Personalized itineraries curated by your AI assistant.",
-              style: TextStyle(
-                color: Colors.grey,
+              const SizedBox(height: 8),
+              const Text(
+                "Personalized itineraries curated by your AI assistant.",
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            _buildTabs(),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    "Trips",
-                    trips.length.toString(),
-                    Icons.flight_takeoff,
+              const SizedBox(height: 20),
+              _buildTabs(),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatCard(
+                      "Trips",
+                      trips.length.toString(),
+                      Icons.flight_takeoff,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildStatCard(
+                      "Saved",
+                      "24",
+                      Icons.bookmark,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildStatCard(
+                      "Days",
+                      "42",
+                      Icons.calendar_month,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                onChanged: (value) {
+                  setState(() {
+                    searchText = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: "Search saved destinations...",
+                  prefixIcon: const Icon(Icons.search),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard(
-                    "Saved",
-                    "24",
-                    Icons.bookmark,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard(
-                    "Days",
-                    "42",
-                    Icons.calendar_month,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              onChanged: (value) {
-                setState(() {
-                  searchText = value;
-                });
-              },
-              decoration: InputDecoration(
-                hintText: "Search saved destinations...",
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
+              ),
+              const SizedBox(height: 20),
+              ...filteredTrips.map(
+                (trip) => Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: _buildTripCard(trip),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            ...filteredTrips.map(
-              (trip) => Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: _buildTripCard(trip),
-              ),
-            ),
-            const SizedBox(height: 80),
-          ],
+              const SizedBox(height: 80),
+            ],
+          ),
         ),
       ),
     );
@@ -255,19 +272,126 @@ bottomNavigationBar: const SizedBox(),
   }
 
   Widget _buildTripCard(Map<String, dynamic> trip) {
-    return Container(
-      height: 150,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          )
-        ],
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 700;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 8,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: isMobile
+              ? _buildMobileTripCard(trip)
+              : _buildDesktopTripCard(trip),
+        );
+      },
+    );
+  }
+
+  Widget _buildMobileTripCard(Map<String, dynamic> trip) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(20),
+          ),
+          child: Image.network(
+            trip["image"],
+            width: double.infinity,
+            height: 200,
+            fit: BoxFit.cover,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                trip["title"],
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                trip["description"],
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 16,
+                runSpacing: 8,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.location_on,
+                          size: 18, color: Colors.red),
+                      Text(trip["spots"]),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.calendar_today,
+                          size: 18, color: Colors.blue),
+                      Text(trip["days"]),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        
+                      },
+                      icon: const Icon(Icons.visibility),
+                      label: const Text("View"),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.share),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      _deleteTrip(trip);
+                    },
+                    icon: const Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDesktopTripCard(Map<String, dynamic> trip) {
+    return SizedBox(
+      height: 180,
       child: Row(
         children: [
           ClipRRect(
@@ -276,7 +400,7 @@ bottomNavigationBar: const SizedBox(),
             ),
             child: Image.network(
               trip["image"],
-              width: 180,
+              width: 250,
               height: double.infinity,
               fit: BoxFit.cover,
             ),
@@ -299,84 +423,46 @@ bottomNavigationBar: const SizedBox(),
                     trip["description"],
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.grey,
-                    ),
                   ),
                   const Spacer(),
-                  Row(
+                  Wrap(
+                    spacing: 20,
                     children: [
-                      const Icon(
-                        Icons.location_on,
-                        size: 18,
-                        color: Colors.red,
-                      ),
                       Text(trip["spots"]),
-                      const SizedBox(width: 20),
-                      const Icon(
-                        Icons.calendar_today,
-                        size: 18,
-                        color: Colors.blue,
-                      ),
                       Text(trip["days"]),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
           ),
           SizedBox(
-            width: 110,
+            width: 140,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/itinerary',
-                      arguments: {
-                        "destination": trip["title"],
-                        "image": trip["image"],
-                        "days": 3,
-                        "travelers": 2,
-                        "budget": 25000,
-                      },
-                    );
-                  },
-                  icon: const Icon(Icons.visibility, size: 16),
+                  onPressed: () {},
+                  icon: const Icon(Icons.visibility),
                   label: const Text("View"),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
+                      onPressed: () {},
                       icon: const Icon(Icons.share),
-                      onPressed: () {
-                        Share.share(
-                          '''
-${trip["name"]}
-
-${trip["description"]}
-
-Explore with TravelWise AI
-      ''',
-                        );
-                      },
                     ),
                     IconButton(
-                      icon: const Icon(
-                        Icons.delete,
-                        color: Colors.red,
-                      ),
                       onPressed: () {},
+                      icon: const Icon(Icons.delete),
                     ),
                   ],
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

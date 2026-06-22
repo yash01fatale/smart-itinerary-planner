@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_itinerary_planner/screens/exploreScreen.dart';
 
 import '../screens/intialScreens/splash_screen.dart';
-import '../screens/onboarding_screen.dart';
+import '../screens/intialScreens/onboarding_screen.dart';
 import '../screens/intialScreens/login_screen.dart';
 import '../screens/intialScreens/signup_screen.dart';
 import '../screens/intialScreens/forgot_password_screen.dart';

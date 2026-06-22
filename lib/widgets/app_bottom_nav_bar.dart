@@ -6,15 +6,17 @@ class AppBottomNavBar extends StatelessWidget {
 
   const AppBottomNavBar({
     super.key,
-    this.selectedIndex = 2,
+    required this.selectedIndex,
   });
 
   void _navigate(BuildContext context, int index) {
+    if (index == selectedIndex) return;
+
     switch (index) {
       case 0:
         Navigator.pushReplacementNamed(
           context,
-          AppRoutes.messagesScreen,
+          AppRoutes.home,
         );
         break;
 
@@ -28,7 +30,7 @@ class AppBottomNavBar extends StatelessWidget {
       case 2:
         Navigator.pushReplacementNamed(
           context,
-          AppRoutes.home,
+          AppRoutes.messagesScreen,
         );
         break;
 
@@ -50,55 +52,94 @@ class AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NavigationBar(
-      selectedIndex: selectedIndex,
-      onDestinationSelected: (index) {
-        if (index != selectedIndex) {
-          _navigate(context, index);
-        }
-      },
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(Icons.chat_bubble_sharp),
-          selectedIcon: Icon(
-            Icons.person,
-            color: Color(0xff006591),
-          ),
-          label: "Chat",
+    const Color primaryBlue = Color(0xFF1976D2);
+    const Color lightBlue = Color(0xFFE3F2FD);
+    const Color indicatorBlue = Color(0xFF90CAF9);
+
+    return SafeArea(
+      top: false,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 12,
+              offset: const Offset(0, -2),
+            ),
+          ],
         ),
-        NavigationDestination(
-          icon: Icon(Icons.search),
-          selectedIcon: Icon(
-            Icons.person,
-            color: Color(0xff006591),
+        child: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            backgroundColor: lightBlue,
+            indicatorColor: indicatorBlue.withValues(alpha: 0.35),
+            iconTheme: WidgetStateProperty.resolveWith(
+              (states) {
+                if (states.contains(WidgetState.selected)) {
+                  return const IconThemeData(
+                    color: primaryBlue,
+                    size: 28,
+                  );
+                }
+                return const IconThemeData(
+                  color: Colors.grey,
+                  size: 24,
+                );
+              },
+            ),
+            labelTextStyle: WidgetStateProperty.resolveWith(
+              (states) {
+                return TextStyle(
+                  color: states.contains(WidgetState.selected)
+                      ? primaryBlue
+                      : Colors.grey.shade700,
+                  fontWeight: states.contains(WidgetState.selected)
+                      ? FontWeight.w600
+                      : FontWeight.w500,
+                  fontSize: 12,
+                );
+              },
+            ),
           ),
-          label: "Explore",
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.map),
-          selectedIcon: Icon(
-            Icons.person,
-            color: Color(0xff006591),
+          child: NavigationBar(
+            selectedIndex: selectedIndex,
+            height: 72,
+            elevation: 0,
+            labelBehavior:
+                NavigationDestinationLabelBehavior.alwaysShow,
+            onDestinationSelected: (index) {
+              _navigate(context, index);
+            },
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.public_outlined),
+                selectedIcon: Icon(Icons.public),
+                label: 'Home',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.travel_explore_outlined),
+                selectedIcon: Icon(Icons.travel_explore),
+                label: 'Explore',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.groups_outlined),
+                selectedIcon: Icon(Icons.groups),
+                label: 'Community',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.bookmark_border),
+                selectedIcon: Icon(Icons.bookmark),
+                label: 'Saved',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.person_outline),
+                selectedIcon: Icon(Icons.person),
+                label: 'Profile',
+              ),
+            ],
           ),
-          label: "Trips",
         ),
-        NavigationDestination(
-          icon: Icon(Icons.bookmark),
-          selectedIcon: Icon(
-            Icons.person,
-            color: Color(0xff006591),
-          ),
-          label: "Saved",
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.person),
-          selectedIcon: Icon(
-            Icons.person,
-            color: Color(0xff006591),
-          ),
-          label: "Profile",
-        ),
-      ],
+      ),
     );
   }
 }

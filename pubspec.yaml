@@ -70,10 +70,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-<<<<<<< HEAD
 
-=======
->>>>>>> 6b356e22e0c5971674deb0de72b6c5132675adcf
   flutter_lints: ^6.0.0
   build_runner: ^2.4.6
   hive_generator: ^2.0.1

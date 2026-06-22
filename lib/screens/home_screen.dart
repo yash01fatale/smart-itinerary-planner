@@ -131,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: const Color(0xffF8FAFC),
 
       // custom app bar
-      appBar: const CustomAppBar(showBackButton: false),
+      appBar: const CustomAppBar(),
 
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color(0xff006591),
@@ -152,280 +152,293 @@ class _HomeScreenState extends State<HomeScreen> {
 
       bottomNavigationBar: const AppBottomNavBar(selectedIndex: 0),
 
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: 350,
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                image: const DecorationImage(
-                  image: NetworkImage(
-                    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-                  ),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(25),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF4FC3F7),
+              Color(0xFFE3F2FD),
+              Colors.white,
+            ],
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                height: 350,
+                margin: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(30),
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [
-                      Colors.black87,
-                      Colors.transparent,
-                    ],
+                  image: const DecorationImage(
+                    image: NetworkImage(
+                      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                    ),
+                    fit: BoxFit.cover,
                   ),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Your Next Adventure,,\nAI-Perfected",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 34,
-                        fontWeight: FontWeight.bold,
-                      ),
+                child: Container(
+                  padding: const EdgeInsets.all(25),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Colors.black87,
+                        Colors.transparent,
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: searchController,
-                            onSubmitted: (_) => _searchCity(),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              hintText: "Search City",
-                              prefixIcon: const Icon(Icons.search),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(18),
-                                borderSide: BorderSide.none,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Your Next Adventure,,\nAI-Perfected",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 34,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: searchController,
+                              onSubmitted: (_) => _searchCity(),
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white,
+                                hintText: "Search City",
+                                prefixIcon: const Icon(Icons.search),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                  borderSide: BorderSide.none,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xffFBBF24),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 25,
-                              vertical: 18,
+                          const SizedBox(width: 10),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xffFBBF24),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 25,
+                                vertical: 18,
+                              ),
+                            ),
+                            onPressed: () async {
+                              _searchCity();
+        
+                              if (searchController.text.isNotEmpty) {
+                                Navigator.pushNamed(
+                                  context,
+                                  AppRoutes.explore,
+                                );
+                              }
+                            },
+                            child: const Text(
+                              "Search",
+                              style: TextStyle(
+                                color: Colors.black,
+                              ),
                             ),
                           ),
-                          onPressed: () async {
-                            _searchCity();
-
-                            if (searchController.text.isNotEmpty) {
-                              Navigator.pushNamed(
-                                context,
-                                AppRoutes.explore,
-                              );
-                            }
-                          },
-                          child: const Text(
-                            "Search",
-                            style: TextStyle(
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Weather in $currentCity',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            SizedBox(height: 12),
-            if (errorMessage != null)
+              SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade100,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    errorMessage!,
-                    style: TextStyle(
-                      color: Colors.red.shade700,
-                      fontSize: 14,
-                    ),
+                child: Text(
+                  'Weather in $currentCity',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              )
-            else if (isLoading)
-              const Center(
-                child: CircularProgressIndicator(),
-              )
-            else if (weather != null)
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    AppRoutes.explore,
-                  );
-                },
-                child: WeatherCard(
-                  weather: weather!,
-                ),
-              )
-            else
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Text("Weather not available"),
               ),
-            SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Select Category",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+              SizedBox(height: 12),
+              if (errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      errorMessage!,
+                      style: TextStyle(
+                        color: Colors.red.shade700,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.explore,
-                      );
-                    },
-                    child: const Text("View All"),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 60,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: categories.length,
-                itemBuilder: (_, index) {
-                  final category = categories[index];
-
-                  return Container(
-                    margin: const EdgeInsets.only(
-                      left: 16,
-                      top: 5,
-                      bottom: 5,
+                )
+              else if (isLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                )
+              else if (weather != null)
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.explore,
+                    );
+                  },
+                  child: WeatherCard(
+                    weather: weather!,
+                  ),
+                )
+              else
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Text("Weather not available"),
+                ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Select Category",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    child: GestureDetector(
-                      onTap: () {
+                    TextButton(
+                      onPressed: () {
                         Navigator.pushNamed(
                           context,
                           AppRoutes.explore,
                         );
                       },
-                      child: Chip(
-                        avatar: Icon(
-                          category["icon"],
-                          color: const Color(0xff006591),
-                        ),
-                        label: Text(category["title"]),
+                      child: const Text("View All"),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 60,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: categories.length,
+                  itemBuilder: (_, index) {
+                    final category = categories[index];
+        
+                    return Container(
+                      margin: const EdgeInsets.only(
+                        left: 16,
+                        top: 5,
+                        bottom: 5,
                       ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Trending Destinations",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  AppRoutes.tripInput,
-                );
-              },
-              child: Container(
-                height: 250,
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(25),
-                  image: const DecorationImage(
-                    image: NetworkImage(
-                      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-                    ),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Recommended For You",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            // Show search recommendations if available
-            SizedBox(
-              height: 350,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: recommendation.length,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                ),
-                itemBuilder: (context, index) {
-                  return SizedBox(
-                      width: 300,
-                      child: RecommendationCard(
-                        item: recommendation[index],
+                      child: GestureDetector(
                         onTap: () {
                           Navigator.pushNamed(
                             context,
-                            AppRoutes. destinationDetails,
-                            arguments: recommendation[index],
+                            AppRoutes.explore,
                           );
                         },
-                      ));
-                },
+                        child: Chip(
+                          avatar: Icon(
+                            category["icon"],
+                            color: const Color(0xff006591),
+                          ),
+                          label: Text(category["title"]),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-            const SizedBox(height: 100),
-          ],
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Trending Destinations",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.tripInput,
+                  );
+                },
+                child: Container(
+                  height: 250,
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25),
+                    image: const DecorationImage(
+                      image: NetworkImage(
+                        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+                      ),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Recommended For You",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              // Show search recommendations if available
+              SizedBox(
+                height: 350,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: recommendation.length,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                  ),
+                  itemBuilder: (context, index) {
+                    return SizedBox(
+                        width: 300,
+                        child: RecommendationCard(
+                          item: recommendation[index],
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes. destinationDetails,
+                              arguments: recommendation[index],
+                            );
+                          },
+                        ));
+                  },
+                ),
+              ),
+              const SizedBox(height: 100),
+            ],
+          ),
         ),
       ),
     );

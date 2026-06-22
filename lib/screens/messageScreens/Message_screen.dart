@@ -15,291 +15,316 @@ class MessagesScreen extends StatefulWidget {
 
 class _MessagesScreenState extends State<MessagesScreen> {
   final TextEditingController _searchController = TextEditingController();
-
-  String searchText = '';
+  final ValueNotifier<String> searchNotifier = ValueNotifier('');
+  
+  @override
+  void dispose() {
+    _searchController.dispose();
+    searchNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     extendBodyBehindAppBar: true,
-  backgroundColor: const Color(0xffF4FAFF),
-
-      appBar: const CustomAppBar(
-        showBackButton: false,
-      ),
+      extendBodyBehindAppBar: true,
+      backgroundColor: const Color(0xffF4FAFF),
+      appBar: const CustomAppBar(),
       bottomNavigationBar: const AppBottomNavBar(
-        selectedIndex: 1,
+        selectedIndex: 2,
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 10),
-
-          /// HEADER
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-            ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF4FC3F7),
+              Color(0xFFE3F2FD),
+              Colors.white,
+            ],
           ),
+        ),
+        child: SafeArea(
+          child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('users').snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text('Error: ${snapshot.error}'),
+                );
+              }
 
-          const SizedBox(height: 50),
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
 
-          /// SEARCH BAR
-         Container(
-  margin: const EdgeInsets.symmetric(horizontal: 20),
-  decoration: BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(30),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(.05),
-        blurRadius: 12,
-      ),
-    ],
-  ),
-  child: TextField(
-    controller: _searchController,
-    onChanged: (value) {
-      setState(() {
-        searchText = value.toLowerCase();
-      });
-    },
-    decoration: const InputDecoration(
-      hintText: "Search travelers...",
-      prefixIcon: Icon(
-        Icons.travel_explore,
-        color: Color(0xff0083B0),
-      ),
-      border: InputBorder.none,
-      contentPadding: EdgeInsets.symmetric(
-        vertical: 18,
-      ),
-    ),
-  ),
-),
-          const SizedBox(height: 15),
+              final currentUser = FirebaseAuth.instance.currentUser;
 
-          /// USERS LIST
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection('users').snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'),
-                  );
-                }
+              if (currentUser == null) {
+                return const Center(
+                  child: Text('Please sign in to continue'),
+                );
+              }
 
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+              final currentUserId = currentUser.uid;
+              final users = snapshot.data?.docs ?? [];
 
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      "No Users Found",
-                    ),
-                  );
-                }
+              // Listen to real-time keystrokes to filter the Firestore data reactively
+              return ValueListenableBuilder<String>(
+                valueListenable: searchNotifier,
+                builder: (context, currentSearchText, child) {
+                  final filteredUsers = users.where((doc) {
+                    final data = doc.data() as Map<String, dynamic>? ?? {};
+                    final uid = data['uid'] ?? '';
 
-                final currentUser = FirebaseAuth.instance.currentUser;
-                if (currentUser == null) {
-                  return const Center(
-                    child: Text('Please sign in to see users.'),
-                  );
-                }
+                    if (uid == currentUserId) {
+                      return false;
+                    }
 
-                final currentUserId = currentUser.uid;
-                final users = snapshot.data!.docs;
-                final normalizedSearch = searchText.trim().toLowerCase();
+                    final name = (data['name'] ?? '').toString().toLowerCase();
+                    final email = (data['email'] ?? '').toString().toLowerCase();
 
-                final filteredUsers = users.where((doc) {
-                  final data = doc.data() as Map<String, dynamic>? ?? {};
-                  final uid = data['uid'] ?? '';
-                  final name = (data['name'] ?? '').toString().toLowerCase();
-                  final email = (data['email'] ?? '').toString().toLowerCase();
+                    if (currentSearchText.trim().isEmpty) {
+                      return true;
+                    }
 
-                  if (uid == currentUserId) {
-                    return false;
-                  }
-                  if (normalizedSearch.isEmpty) {
-                    return true;
-                  }
+                    return name.contains(currentSearchText) || email.contains(currentSearchText);
+                  }).toList();
 
-                  return name.contains(normalizedSearch) ||
-                      email.contains(normalizedSearch);
-                }).toList();
-
-                if (filteredUsers.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      "No Users Found",
-                    ),
-                  );
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                  ),
-                  itemCount: filteredUsers.length,
-                  itemBuilder: (context, index) {
-                    final user = filteredUsers[index];
-
-                    final data = user.data() as Map<String, dynamic>;
-
-                    final userId = user.id;
-
-                    final name = data['name'] ?? 'Unknown User';
-                    final email = data['email'] ?? '';
-                    final photoUrl = data['photoUrl'] ?? '';
-
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(24),
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xffF8FBFF),
-                            Color(0xffEAF6FF),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(.05),
-                            blurRadius: 15,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
+                  // The layout needs to be returned INSIDE the ValueListenableBuilder's builder function
+                  return CustomScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                      /// Header
+                      const SliverToBoxAdapter(
+                        child: SizedBox(height: 10),
                       ),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(24),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ChatScreen(
-                                receiverId: userId,
-                                receiverName: name,
-                                receiverPhoto: photoUrl,
+
+                      /// Search Bar
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: const Color(0xFF0288D1).withValues(alpha: .1),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF0288D1).withValues(alpha: .1),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: TextField(
+                              controller: _searchController,
+                              onChanged: (value) {
+                                searchNotifier.value = value.toLowerCase();
+                              },
+                              decoration: const InputDecoration(
+                                hintText: "Search travelers...",
+                                prefixIcon: Icon(
+                                  Icons.search,
+                                  color: Color(0xFF0288D1),
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(vertical: 18),
                               ),
                             ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(18),
-                          child: Row(
-                            children: [
-                              Stack(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 34,
-                                    backgroundColor: Colors.white,
-                                    backgroundImage: photoUrl.isNotEmpty
-                                        ? NetworkImage(photoUrl)
-                                        : null,
-                                    child: photoUrl.isEmpty
-                                        ? const Icon(
-                                            Icons.person,
-                                            size: 35,
-                                          )
-                                        : null,
-                                  ),
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Container(
-                                      height: 14,
-                                      width: 14,
-                                      decoration: BoxDecoration(
-                                        color: Colors.green,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Colors.white,
-                                          width: 2,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-
-                              const SizedBox(
-                                width: 16,
-                              ),
-
-                              /// Info
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      name,
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      email,
-                                      style: TextStyle(
-                                        color: Colors.grey.shade600,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // chat Screen
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 10,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color(0xff00B4DB),
-                                      Color(0xff0083B0),
-                                    ],
-                                  ),
-                                ),
-                                child: const Row(
-                                  children: [
-                                    Icon(
-                                      Icons.send_rounded,
-                                      color: Colors.white,
-                                      size: 18,
-                                    ),
-                                    SizedBox(width: 6),
-                                    Text(
-                                      "Chat",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              )
-                            ],
                           ),
                         ),
                       ),
-                    );
-                  },
-                );
-              },
-            ),
+
+                      const SliverToBoxAdapter(
+                        child: SizedBox(height: 20),
+                      ),
+
+                      /// Users List
+                      if (filteredUsers.isEmpty)
+                        const SliverFillRemaining(
+                          child: Center(
+                            child: Text(
+                              "No Travelers Found",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        )
+                      else
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final user = filteredUsers[index];
+                              final data = user.data() as Map<String, dynamic>;
+                              final userId = user.id;
+
+                              final name = data['name'] ?? 'Unknown User';
+                              final email = data['email'] ?? '';
+                              final photoUrl = data['photoUrl'] ?? '';
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 8,
+                                ),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(22),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => ChatScreen(
+                                          receiverId: userId,
+                                          receiverName: name,
+                                          receiverPhoto: photoUrl,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(22),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFF0288D1).withValues(alpha: .08),
+                                          blurRadius: 20,
+                                          offset: const Offset(0, 8),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        /// Avatar
+                                        Stack(
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(2),
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: const Color(0xFF03A9F4),
+                                                  width: 2,
+                                                ),
+                                              ),
+                                              child: CircleAvatar(
+                                                radius: 30,
+                                                backgroundColor: Colors.white,
+                                                backgroundImage: photoUrl.isNotEmpty
+                                                    ? NetworkImage(photoUrl)
+                                                    : null,
+                                                child: photoUrl.isEmpty
+                                                    ? const Icon(
+                                                        Icons.person,
+                                                        size: 30,
+                                                      )
+                                                    : null,
+                                              ),
+                                            ),
+                                            Positioned(
+                                              bottom: 2,
+                                              right: 2,
+                                              child: Container(
+                                                height: 12,
+                                                width: 12,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.green,
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: Colors.white,
+                                                    width: 2,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(width: 16),
+
+                                        /// User Info
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                name,
+                                                style: const TextStyle(
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xFF1A1A1A),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              const Text(
+                                                "Travel Enthusiast",
+                                                style: TextStyle(
+                                                  color: Color(0xFF0288D1),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                email,
+                                                style: TextStyle(
+                                                  color: Colors.grey.shade600,
+                                                  fontSize: 13,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                        /// Chat Button
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 14,
+                                            vertical: 10,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(30),
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color(0xFF03A9F4),
+                                                Color(0xFF0288D1),
+                                              ],
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.send_rounded,
+                                            color: Colors.white,
+                                            size: 18,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            childCount: filteredUsers.length,
+                          ),
+                        ),
+
+                      const SliverToBoxAdapter(
+                        child: SizedBox(height: 90),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
           ),
-        ],
+        ),
       ),
     );
   }

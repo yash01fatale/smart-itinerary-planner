@@ -52,40 +52,53 @@ class _ExploreScreenState extends State<ExploreScreen> {
     return Scaffold(
       appBar: const CustomAppBar(),
       bottomNavigationBar: const AppBottomNavBar(selectedIndex: 1),
-      body: SingleChildScrollView(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: searchController,
-              onChanged: (value) {
-                searchDestination(value);
-              },
-              decoration: InputDecoration(
-                hintText: "Search Any Destination...",
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF4FC3F7),
+              Color(0xFFE3F2FD),
+              Colors.white,
+            ],
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: TextField(
+                controller: searchController,
+                onChanged: (value) {
+                  searchDestination(value);
+                },
+                decoration: InputDecoration(
+                  hintText: "Search Any Destination...",
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                 ),
               ),
             ),
-          ),
-          CategoryChips(
-  selectedCategory: selectedCategory,
-            onCategorySelected: (category) {
-              setState(() {
-                selectedCategory = category;
-              });
-            },
-          ),
-          searchController.text.isNotEmpty
-              ? SearchResultsSection(
-                  destinations: searchResults,
-                )
-              : PopularDestinationsSection(
-                  category: selectedCategory,
-                ),
-        ]),
+            CategoryChips(
+          selectedCategory: selectedCategory,
+              onCategorySelected: (category) {
+                setState(() {
+                  selectedCategory = category;
+                });
+              },
+            ),
+            searchController.text.isNotEmpty
+                ? SearchResultsSection(
+                    destinations: searchResults,
+                  )
+                : PopularDestinationsSection(
+                    category: selectedCategory,
+                  ),
+          ]),
+        ),
       ),
     );
   }
