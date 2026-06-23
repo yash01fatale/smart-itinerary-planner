@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:smart_itinerary_planner/screens/intialScreens/profile/edit_profile.dart';
+import 'package:smart_itinerary_planner/screens/intialScreens/profile/profile_screen.dart';
 
 class CustomAppBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -33,6 +35,7 @@ class CustomAppBar extends StatelessWidget
         children: [
           Container(
             padding: const EdgeInsets.all(8),
+            
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(.2),
               borderRadius: BorderRadius.circular(12),
@@ -72,28 +75,33 @@ class CustomAppBar extends StatelessWidget
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 16),
-          child: Container(
-            padding: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white,
-                width: 2,
+          
+          child: GestureDetector(
+            onTap: () => Navigator.push(context,MaterialPageRoute(builder: (context)=>EditProfileScreen())),
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white,
+                  width: 2,
+                ),
               ),
-            ),
-            child: CircleAvatar(
-              radius: 20,
-              backgroundColor: Colors.white,
-              backgroundImage:
-                  photoUrl != null && photoUrl.isNotEmpty
-                      ? NetworkImage(photoUrl)
-                      : null,
-              child: photoUrl == null || photoUrl.isEmpty
-                  ? const Icon(
-                      Icons.person,
-                      color: Color(0xFF0288D1),
-                    )
-                  : null,
+              child: CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.white,
+                backgroundImage:
+                    photoUrl != null && photoUrl.isNotEmpty
+                        ? NetworkImage(photoUrl)
+                        : null,
+                child: photoUrl == null || photoUrl.isEmpty
+                    ? const Icon(
+                        Icons.person,
+                        color: Color(0xFF0288D1),
+                      )
+                    : null,
+              ),
+              
             ),
           ),
         ),
