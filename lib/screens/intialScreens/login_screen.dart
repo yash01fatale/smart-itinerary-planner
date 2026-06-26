@@ -141,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 10),
 
                     const Text(
-                      "TravelWise AI",
+                      "GhoomEra Travel AI",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 34,

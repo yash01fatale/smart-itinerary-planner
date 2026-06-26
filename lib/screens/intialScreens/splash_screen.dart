@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:smart_itinerary_planner/config/app_constants.dart';
 import '../../config/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -203,7 +204,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ).createShader(bounds);
                   },
                   child: const Text(
-                    "TravelWise AI",
+                    AppConstants.appName,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 42,

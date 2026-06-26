@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:smart_itinerary_planner/config/app_constants.dart';
 import 'package:smart_itinerary_planner/screens/intialScreens/profile/edit_profile.dart';
-import 'package:smart_itinerary_planner/screens/intialScreens/profile/profile_screen.dart';
 
 class CustomAppBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -53,8 +53,7 @@ class CustomAppBar extends StatelessWidget
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'TravelWise AI',
+              Text(AppConstants.appName,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 15,

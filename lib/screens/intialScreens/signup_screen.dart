@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:smart_itinerary_planner/config/app_constants.dart';
 import '../../config/app_routes.dart';
 import '../../models/user_model.dart';
 import '../../services/firebase_service.dart';
@@ -132,8 +133,7 @@ class SignupScreen extends StatelessWidget {
 
                   const SizedBox(height: 15),
 
-                  const Text(
-                    "TravelWise AI",
+                  const Text(AppConstants.appName,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 34,

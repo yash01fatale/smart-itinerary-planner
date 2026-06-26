@@ -8,7 +8,7 @@ class AppConstants {
   static const String googleMapsApiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
 
   // App Info
-  static const String appName = 'TripGenie';
+  static const String appName = 'GhoomEra Travel AI';
   static const String appVersion = '1.0.0';
 
   // Collections

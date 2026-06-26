@@ -21,7 +21,7 @@ Future<void> main() async {
     print("database connected sucessfully");
     
   } catch (e) {
-    print("Database is not connected");
+    print("Database is not connected $e.message");
   }
 
   runApp(const SmartItineraryPlanner());
